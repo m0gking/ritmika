@@ -45,6 +45,59 @@
     --brass: #a9793a;
     --brass-soft: #c9a25e;
   }
+  /* ---- тема PickMee: тёмная база + свой градиентный акцент на каждом модуле ---- */
+  [data-theme="pickmee"] {
+    --bg: #16131c;
+    --bg-soft: #1e1a26;
+    --surface: #241f2e;
+    --surface-2: #2e2839;
+    --line: #3a3348aa;
+    --line-solid: #3a3348;
+    --text: #f2eefa;
+    --text-dim: #a99fc0;
+    --text-faint: #6f6685;
+    --brass: #c58fe0;
+    --brass-soft: #e0b8f0;
+    /* модульные цвета по референсу PickMee */
+    --sleep: #4a45d8;   /* цвет 1 — тёмно-синий */
+    --habit: #9fc47a;   /* цвет 2 — светло-салатовый */
+    --steps: #f0a8e0;   /* цвет 7 — нежно-розовый */
+    --food:  #f0932e;   /* цвет 10 — оранжевый */
+  }
+  /* градиентная заливка карточки времени под цвет текущего модуля */
+  [data-theme="pickmee"][data-screen="sleep"] .now-card {
+    background: linear-gradient(135deg,#1e1bb8,#6b5fd6); border-color:#6b5fd6; color:#fff;
+  }
+  [data-theme="pickmee"][data-screen="habit"] .now-card {
+    background: linear-gradient(135deg,#cdd8c0,#e8dfa8); border-color:#cdd8c0; color:#2a2a1a;
+  }
+  [data-theme="pickmee"][data-screen="habit"] .now-card .nc-date { color:#4a4a30; }
+  [data-theme="pickmee"][data-screen="habit"] .now-card .nc-label { color:#5a5a3a; }
+  [data-theme="pickmee"][data-screen="steps"] .now-card {
+    background: linear-gradient(135deg,#f0a8e0,#f8d0f0); border-color:#f0a8e0; color:#5a2a50;
+  }
+  [data-theme="pickmee"][data-screen="steps"] .now-card .nc-date { color:#7a3a6a; }
+  [data-theme="pickmee"][data-screen="steps"] .now-card .nc-label { color:#8a4a7a; }
+  [data-theme="pickmee"][data-screen="food"] .now-card {
+    background: linear-gradient(135deg,#f0932e,#f0b840); border-color:#f0932e; color:#3a2408;
+  }
+  [data-theme="pickmee"][data-screen="food"] .now-card .nc-date { color:#5a3a12; }
+  [data-theme="pickmee"][data-screen="food"] .now-card .nc-label { color:#6a4418; }
+  /* акцентный градиент на заголовке модуля */
+  [data-theme="pickmee"][data-screen="sleep"] .module-title { background:linear-gradient(90deg,#6b5fd6,#9d8ef0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  [data-theme="pickmee"][data-screen="habit"] .module-title { background:linear-gradient(90deg,#9fc47a,#c8d89a); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  [data-theme="pickmee"][data-screen="steps"] .module-title { background:linear-gradient(90deg,#f0a8e0,#f8c8f0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  [data-theme="pickmee"][data-screen="food"] .module-title { background:linear-gradient(90deg,#f0932e,#f0b840); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  /* статистика — цвет 8 (малиново-розовый) */
+  [data-theme="pickmee"][data-screen="stats"] { --brass: #d84463; }
+  [data-theme="pickmee"][data-screen="stats"] .now-card {
+    background: linear-gradient(135deg,#e0455f,#c93a6e); border-color:#e0455f; color:#fff;
+  }
+  [data-theme="pickmee"][data-screen="stats"] .now-card .nc-date { color:#ffd8e0; }
+  [data-theme="pickmee"][data-screen="stats"] .now-card .nc-label { color:#ffc0cf; }
+  [data-theme="pickmee"][data-screen="stats"] .module-title { background:linear-gradient(90deg,#e0455f,#c93a6e); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  [data-theme="pickmee"][data-screen="stats"] .stats-dot,
+  [data-theme="pickmee"][data-screen="stats"] .period-seg button.active { background: linear-gradient(90deg,#e0455f,#c93a6e); }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     background: var(--bg); color: var(--text);
@@ -245,11 +298,34 @@
     cursor: pointer; transition: .15s; font-weight: 500;
   }
   .seg button.active { background: var(--brass); color: #fff; }
+  .theme-row { flex-direction: column; align-items: stretch; }
+  .seg-wide { width: 100%; }
+  .seg-wide button { flex: 1; padding: 8px 4px; font-size: 11px; text-align: center; }
+  /* активная кнопка PickMee — градиентная */
+  .seg-wide button[data-theme-val="pickmee"].active {
+    background: linear-gradient(90deg,#f0932e,#f0a8e0); color:#fff;
+  }
   .sheet-close {
     width: 100%; margin-top: 18px; padding: 13px; border-radius: 11px;
     background: var(--surface); border: 1px solid var(--line-solid); color: var(--text);
     font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit;
   }
+  .data-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .data-btn {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 12px; padding: 13px 14px; cursor: pointer;
+    font-family: inherit; color: var(--text); transition: .15s; text-align: left;
+  }
+  .data-btn:active { background: var(--surface-2); transform: scale(.99); }
+  .data-btn .db-icon {
+    width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
+    background: var(--surface-2); color: var(--brass);
+    display: grid; place-items: center; font-size: 18px; font-weight: 700;
+  }
+  .data-btn .db-text { display: flex; flex-direction: column; }
+  .data-btn .db-text b { font-size: 14px; font-weight: 600; }
+  .data-btn .db-text span { font-size: 11px; color: var(--text-faint); margin-top: 1px; }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -648,6 +724,52 @@
     font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
   }
 
+  /* ---------- Вкладка Статистика ---------- */
+  .period-seg {
+    display: flex; gap: 4px; margin: 14px 20px 4px;
+    background: var(--surface-2); border: 1px solid var(--line-solid);
+    border-radius: 11px; padding: 4px;
+  }
+  .period-seg button {
+    flex: 1; border: none; background: transparent; color: var(--text-dim);
+    padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    font-family: inherit; cursor: pointer; transition: .15s;
+  }
+  .period-seg button.active { background: var(--brass); color: #fff; }
+
+  .stat-card {
+    margin: 12px 20px 0; background: var(--surface);
+    border: 1px solid var(--line-solid); border-radius: 16px; padding: 16px;
+  }
+  .stat-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+  .stat-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .stat-title { font-size: 14px; color: var(--text-dim); font-weight: 500; }
+  .stat-big {
+    margin-left: auto; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-sub { font-size: 12px; color: var(--text-faint); margin-bottom: 12px; }
+  .stat-chart { width: 100%; }
+  .stat-chart svg { width: 100%; display: block; overflow: visible; }
+
+  /* кольца КБЖУ */
+  .macro-rings { display: flex; justify-content: space-around; gap: 8px; padding-top: 6px; }
+  .mring { text-align: center; flex: 1; }
+  .mring svg { width: 62px; height: 62px; }
+  .mring .mr-val { font-size: 13px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .mring .mr-label { font-size: 10px; color: var(--text-faint); }
+
+  /* список привычек в статистике */
+  .habit-stats-list { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+  .hs-item {}
+  .hs-item .hs-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .hs-item .hs-name { font-size: 13px; font-weight: 500; }
+  .hs-item .hs-pct { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hs-item .hs-bar { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .hs-item .hs-bar span { display: block; height: 100%; background: var(--habit); border-radius: 4px; width: 0; transition: width .5s ease; }
+  .hs-item .hs-streak { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+  .stat-empty { text-align: center; color: var(--text-faint); font-size: 13px; padding: 10px 0; }
+
   @media (prefers-reduced-motion: reduce) {
     .brand .pulse { animation: none; }
   }
@@ -868,6 +990,70 @@
   <button class="habit-add-btn" id="habitAddBtn" type="button">+ Добавить привычку</button>
 </div>
 
+<!-- ============ ЭКРАН: СТАТИСТИКА ============ -->
+<div class="screen" id="screen-stats">
+  <div class="module-head">
+    <div class="module-title">Статистика</div>
+    <div class="module-sub">Твои данные за период</div>
+  </div>
+
+  <div class="now-card">
+    <span class="nc-time" id="ncTimeStats">00:00</span>
+    <span class="nc-date" id="ncDateStats">—</span>
+    <span class="nc-label">сейчас</span>
+  </div>
+
+  <!-- переключатель периода -->
+  <div class="period-seg" id="periodSeg">
+    <button data-period="7" class="active">7 дней</button>
+    <button data-period="30">30 дней</button>
+  </div>
+
+  <!-- Сон -->
+  <div class="stat-card" data-acc="sleep">
+    <div class="stat-head">
+      <span class="stat-dot" style="background:var(--sleep)"></span>
+      <span class="stat-title">Сон</span>
+      <span class="stat-big" id="statSleepAvg">—</span>
+    </div>
+    <div class="stat-sub" id="statSleepSub">нет данных</div>
+    <div class="stat-chart" id="chartSleep"></div>
+  </div>
+
+  <!-- Шаги -->
+  <div class="stat-card" data-acc="steps">
+    <div class="stat-head">
+      <span class="stat-dot" style="background:var(--steps)"></span>
+      <span class="stat-title">Шаги</span>
+      <span class="stat-big" id="statStepsAvg">—</span>
+    </div>
+    <div class="stat-sub" id="statStepsSub">нет данных</div>
+    <div class="stat-chart" id="chartSteps"></div>
+  </div>
+
+  <!-- Питание -->
+  <div class="stat-card" data-acc="food">
+    <div class="stat-head">
+      <span class="stat-dot" style="background:var(--food)"></span>
+      <span class="stat-title">Питание</span>
+      <span class="stat-big" id="statFoodAvg">—</span>
+    </div>
+    <div class="stat-sub" id="statFoodSub">нет данных</div>
+    <div class="macro-rings" id="macroRings"></div>
+  </div>
+
+  <!-- Привычки -->
+  <div class="stat-card" data-acc="habit">
+    <div class="stat-head">
+      <span class="stat-dot" style="background:var(--habit)"></span>
+      <span class="stat-title">Привычки</span>
+      <span class="stat-big" id="statHabitAvg">—</span>
+    </div>
+    <div class="stat-sub" id="statHabitSub">нет данных</div>
+    <div class="habit-stats-list" id="habitStatsList"></div>
+  </div>
+</div>
+
 <!-- Модалка выбора даты и времени -->
 <div class="dtp-scrim" id="dtpScrim">
   <div class="dtp">
@@ -1018,20 +1204,23 @@
     <div class="nav-item" data-screen="food"><span class="ni-dot" style="background:var(--food)"></span>Питание</div>
     <div class="nav-item" data-screen="steps"><span class="ni-dot" style="background:var(--steps)"></span>Шаги</div>
     <div class="nav-item" data-screen="habit"><span class="ni-dot" style="background:var(--habit)"></span>Привычки</div>
+    <div class="nav-item" data-screen="stats"><span class="ni-dot" style="background:var(--brass)"></span>Статистика</div>
   </nav>
-  <div class="drawer-foot">Ritmika · версия 0.1</div>
+  <div class="drawer-foot">Ritmika · версия 0.2</div>
 </aside>
 
 <!-- Settings sheet -->
 <div class="sheet-scrim" id="settingsScrim">
   <div class="sheet">
     <h3>Настройки</h3>
-    <div class="set-row">
-      <div><div class="sr-label">Тема</div><div class="sr-sub">оформление приложения</div></div>
-      <div class="seg" id="themeSeg">
+    <div class="set-row theme-row">
+      <div class="sr-label">Тема</div>
+      <div class="sr-sub" style="margin-bottom:10px">оформление приложения</div>
+      <div class="seg seg-wide" id="themeSeg">
         <button data-theme-val="dark">Тёмная</button>
         <button data-theme-val="light">Светлая</button>
         <button data-theme-val="auto">Авто</button>
+        <button data-theme-val="pickmee">PickMee</button>
       </div>
     </div>
     <div class="set-row">
@@ -1046,6 +1235,19 @@
       <div><div class="sr-label">Приветствие по времени</div><div class="sr-sub">доброе утро / вечер</div></div>
       <div class="toggle on" id="tglGreeting"></div>
     </div>
+
+    <div class="data-buttons">
+      <button class="data-btn" id="exportBtn" type="button">
+        <span class="db-icon">↓</span>
+        <span class="db-text"><b>Экспорт данных</b><span>сохранить всё в файл</span></span>
+      </button>
+      <button class="data-btn" id="importBtn" type="button">
+        <span class="db-icon">↑</span>
+        <span class="db-text"><b>Импорт данных</b><span>загрузить из файла</span></span>
+      </button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </div>
+
     <button class="sheet-close" id="settingsClose">Готово</button>
   </div>
 </div>
@@ -1059,6 +1261,26 @@
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 function haptic(t='light'){ tg?.HapticFeedback?.impactOccurred?.(t); }
+
+/* всплывающее уведомление снизу */
+let flashTimer;
+function flash(msg){
+  let el = document.getElementById('flashToast');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'flashToast';
+    el.style.cssText = `position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));
+      transform:translateX(-50%);background:var(--surface-2);color:var(--text);
+      padding:12px 18px;border-radius:12px;font-size:14px;z-index:99;
+      border:1px solid var(--line-solid);transition:opacity .2s;opacity:0;
+      max-width:90%;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);`;
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(()=>el.style.opacity='0', 2200);
+}
 
 /* ---- настройки ---- */
 const SETTINGS_KEY = 'FOCUSOR_SETTINGS';
@@ -1075,13 +1297,13 @@ function applyTheme(){
   let mode = settings.theme;
   if (mode === 'auto') mode = prefersLight.matches ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', mode);
-  // подгоняем цвет статус-бара
+  document.body.setAttribute('data-theme', mode); // для селекторов body[data-theme][data-screen]
+  const bg = mode === 'light' ? '#f5f2ea' : (mode === 'pickmee' ? '#16131c' : '#14130f');
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', mode === 'light' ? '#f5f2ea' : '#14130f');
-  // в Telegram красим шапку/фон под тему
+  if (meta) meta.setAttribute('content', bg);
   try {
-    tg?.setBackgroundColor?.(mode === 'light' ? '#f5f2ea' : '#14130f');
-    tg?.setHeaderColor?.(mode === 'light' ? '#f5f2ea' : '#14130f');
+    tg?.setBackgroundColor?.(bg);
+    tg?.setHeaderColor?.(bg);
   } catch {}
 }
 applyTheme();
@@ -1143,6 +1365,12 @@ function tick(){
     document.getElementById('ncDateHabit').textContent =
       `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
   }
+  const nst = document.getElementById('ncTimeStats');
+  if (nst) {
+    nst.textContent = `${pad(h)}:${pad(m)}`;
+    document.getElementById('ncDateStats').textContent =
+      `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  }
 
   // приветствие
   const g = document.getElementById('greeting');
@@ -1170,7 +1398,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
     const target = item.dataset.screen;
     // все модули теперь готовы
-    const ready = ['home','sleep','steps','food','habit'];
+    const ready = ['home','sleep','steps','food','habit','stats'];
     if (!ready.includes(target)) {
       haptic(); closeDrawer(); return;
     }
@@ -1191,6 +1419,7 @@ function showScreen(name){
   if (name === 'steps') renderSteps();
   if (name === 'food') renderFood();
   if (name === 'habit') renderHabits();
+  if (name === 'stats') renderStats();
 }
 
 /* ---- настройки sheet ---- */
@@ -1224,6 +1453,79 @@ themeSeg.querySelectorAll('button').forEach(b => {
     settings.theme = b.dataset.themeVal;
     syncThemeSeg(); applyTheme(); saveSettings(); haptic();
   });
+});
+
+/* ============================================================
+   ЭКСПОРТ / ИМПОРТ ДАННЫХ
+   Собирает все ключи (сон, шаги, план, питание, привычки,
+   настройки) в один JSON-файл и восстанавливает из него.
+   ============================================================ */
+const ALL_KEYS = {
+  settings: 'FOCUSOR_SETTINGS',
+  sleep:    'RITMIKA_SLEEP',
+  steps:    'RITMIKA_STEPS',
+  plan:     'RITMIKA_PLAN',
+  food:     'RITMIKA_FOOD',
+  habits:   'RITMIKA_HABITS'
+};
+
+// универсальное чтение одного ключа (cloud или localStorage)
+function readKey(key){
+  return new Promise(res=>{
+    if (hasCloud) cloud.getItem(key,(e,v)=>res(e?null:v));
+    else res(localStorage.getItem(key));
+  });
+}
+// универсальная запись
+function writeKey(key,val){
+  return new Promise(res=>{
+    if (hasCloud) cloud.setItem(key,val,()=>res());
+    else { localStorage.setItem(key,val); res(); }
+  });
+}
+
+document.getElementById('exportBtn').addEventListener('click', async ()=>{
+  haptic();
+  const dump = { app:'Ritmika', version:'0.2', exportedAt:new Date().toISOString(), data:{} };
+  for (const [name,key] of Object.entries(ALL_KEYS)){
+    const raw = await readKey(key);
+    dump.data[name] = raw ? JSON.parse(raw) : null;
+  }
+  const blob = new Blob([JSON.stringify(dump,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  a.href = url;
+  a.download = `ritmika-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  flash('Данные сохранены в файл');
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  haptic();
+  document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    let dump;
+    try { dump = JSON.parse(reader.result); }
+    catch { flash('Не удалось прочитать файл'); return; }
+    if (!dump || !dump.data) { flash('Файл не похож на бэкап Ritmika'); return; }
+    if (!confirm('Импорт заменит все текущие данные на данные из файла. Продолжить?')) return;
+
+    for (const [name,key] of Object.entries(ALL_KEYS)){
+      if (dump.data[name] != null) await writeKey(key, JSON.stringify(dump.data[name]));
+    }
+    haptic('medium');
+    flash('Данные загружены, перезапуск…');
+    setTimeout(()=>location.reload(), 800);
+  };
+  reader.readAsText(file);
+  e.target.value = ''; // сброс, чтобы повторный выбор того же файла срабатывал
 });
 
 /* ---- карточки на главной ведут в модули ---- */
@@ -1994,6 +2296,227 @@ function syncHomeHabitCard(){
   syncHomeHabitCard();
   if (document.body.getAttribute('data-screen')==='habit') renderHabits();
 })();
+
+/* ============================================================
+   МОДУЛЬ: СТАТИСТИКА
+   Читает уже загруженные SLEEP, STEPS, FOOD, PLAN, HABITS
+   и рисует лёгкие SVG-графики за период (7 или 30 дней).
+   ============================================================ */
+let statsPeriod = 7;
+
+document.getElementById('periodSeg').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  statsPeriod = +btn.dataset.period;
+  document.querySelectorAll('#periodSeg button').forEach(b=>b.classList.toggle('active', b===btn));
+  haptic(); renderStats();
+});
+
+// массив дат за последние N дней (старые→новые), формат YYYY-MM-DD
+function lastNDays(n){
+  const arr=[]; const now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now); d.setDate(now.getDate()-i);
+    arr.push({date:d, key:dKey(d)});
+  }
+  return arr;
+}
+
+function renderStats(){
+  const days = lastNDays(statsPeriod);
+  renderSleepStat(days);
+  renderStepsStat(days);
+  renderFoodStat(days);
+  renderHabitStat(days);
+}
+
+/* --- СОН: линейный график длительности --- */
+function renderSleepStat(days){
+  // сон привязан к дате пробуждения
+  const byWake={}; SLEEP.forEach(r=>{ byWake[dKey(new Date(r.wake))] = r; });
+  const vals = days.map(d=>{
+    const r=byWake[d.key];
+    if(!r) return null;
+    return (new Date(r.wake)-new Date(r.bed))/3600000; // часы
+  });
+  const present = vals.filter(v=>v!=null);
+  const avg = present.length ? present.reduce((a,b)=>a+b,0)/present.length : 0;
+  document.getElementById('statSleepAvg').textContent = present.length ? fmtDur(avg*60) : '—';
+  document.getElementById('statSleepSub').textContent = present.length
+    ? `среднее за ${present.length} ${plur(present.length,'ночь','ночи','ночей')} · цель 8 ч`
+    : 'нет записей за период';
+  document.getElementById('chartSleep').innerHTML =
+    present.length ? lineChart(vals, days, {goal:8, unit:'ч', color:'var(--sleep)', max:12}) : emptyChart();
+}
+
+/* --- ШАГИ: столбчатый график --- */
+function renderStepsStat(days){
+  const vals = days.map(d=> STEPS[d.key] ?? null);
+  const present = vals.filter(v=>v!=null);
+  const avg = present.length ? Math.round(present.reduce((a,b)=>a+b,0)/present.length) : 0;
+  const total = present.reduce((a,b)=>a+b,0);
+  document.getElementById('statStepsAvg').textContent = present.length ? avg.toLocaleString('ru-RU') : '—';
+  document.getElementById('statStepsSub').textContent = present.length
+    ? `в среднем за день · всего ${total.toLocaleString('ru-RU')} шагов`
+    : 'нет записей за период';
+  document.getElementById('chartSteps').innerHTML =
+    present.length ? barChart(vals, days, {goal:8000, color:'var(--steps)', goalColor:'#5fbf74'}) : emptyChart();
+}
+
+/* --- ПИТАНИЕ: кольца среднего КБЖУ + дни в норме --- */
+function renderFoodStat(days){
+  let sumCal=0, sumP=0, sumF=0, sumC=0, cnt=0, inNorm=0;
+  days.forEach(d=>{
+    const items=FOOD[d.key];
+    if(items && items.length){
+      const s=items.reduce((a,x)=>({cal:a.cal+x.cal,p:a.p+x.p,f:a.f+x.f,c:a.c+x.c}),{cal:0,p:0,f:0,c:0});
+      sumCal+=s.cal; sumP+=s.p; sumF+=s.f; sumC+=s.c; cnt++;
+      if(s.cal>=PLAN.cal*0.85 && s.cal<=PLAN.cal*1.15) inNorm++;
+    }
+  });
+  if(!cnt){
+    document.getElementById('statFoodAvg').textContent='—';
+    document.getElementById('statFoodSub').textContent='нет записей за период';
+    document.getElementById('macroRings').innerHTML='';
+    return;
+  }
+  const avgCal=Math.round(sumCal/cnt);
+  document.getElementById('statFoodAvg').textContent=avgCal.toLocaleString('ru-RU');
+  document.getElementById('statFoodSub').textContent=
+    `ккал в среднем · ${inNorm} из ${cnt} ${plur(cnt,'день','дня','дней')} в норме`;
+  const rings=[
+    {label:'Белки', val:Math.round(sumP/cnt), norm:PLAN.p, color:'#7b9df0'},
+    {label:'Жиры',  val:Math.round(sumF/cnt), norm:PLAN.f, color:'#e0a45e'},
+    {label:'Углев', val:Math.round(sumC/cnt), norm:PLAN.c, color:'#8fd99a'}
+  ];
+  document.getElementById('macroRings').innerHTML = rings.map(r=>{
+    const pct=Math.min(100,(r.val/r.norm)*100);
+    const R=24, C=2*Math.PI*R, off=C*(1-pct/100);
+    return `<div class="mring">
+      <svg viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="6"/>
+        <circle cx="30" cy="30" r="${R}" fill="none" stroke="${r.color}" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"
+          transform="rotate(-90 30 30)"/>
+      </svg>
+      <div class="mr-val">${r.val}<span style="color:var(--text-faint);font-weight:400">/${r.norm}</span></div>
+      <div class="mr-label">${r.label}</div>
+    </div>`;
+  }).join('');
+}
+
+/* --- ПРИВЫЧКИ: процент выполнения + серия --- */
+function renderHabitStat(days){
+  const list=HABITS.list||[];
+  if(!list.length){
+    document.getElementById('statHabitAvg').textContent='—';
+    document.getElementById('statHabitSub').textContent='привычек пока нет';
+    document.getElementById('habitStatsList').innerHTML='';
+    return;
+  }
+  // общий процент по всем привычкам за период
+  let totalCells=0, doneCells=0;
+  const perHabit = list.map(h=>{
+    let done=0;
+    days.forEach(d=>{ if(HABITS.done[`${h.id}|${d.key}`]) done++; });
+    totalCells+=days.length; doneCells+=done;
+    // текущая серия (подряд с сегодня назад)
+    let streak=0;
+    for(let i=days.length-1;i>=0;i--){
+      if(HABITS.done[`${h.id}|${days[i].key}`]) streak++; else break;
+    }
+    return {name:h.name, pct:Math.round(done/days.length*100), streak};
+  });
+  const overall = totalCells ? Math.round(doneCells/totalCells*100) : 0;
+  document.getElementById('statHabitAvg').textContent = overall+'%';
+  document.getElementById('statHabitSub').textContent =
+    `общее выполнение за ${statsPeriod} дней`;
+  document.getElementById('habitStatsList').innerHTML = perHabit.map(h=>`
+    <div class="hs-item">
+      <div class="hs-top">
+        <span class="hs-name">${escapeHtml(h.name)}</span>
+        <span class="hs-pct">${h.pct}%</span>
+      </div>
+      <div class="hs-bar"><span style="width:${h.pct}%"></span></div>
+      ${h.streak>1?`<div class="hs-streak">🔥 серия ${h.streak} ${plur(h.streak,'день','дня','дней')} подряд</div>`:''}
+    </div>`).join('');
+}
+
+/* --- SVG-генераторы --- */
+function lineChart(vals, days, opt){
+  const W=300, H=90, pad=6;
+  const max=opt.max || Math.max(...vals.filter(v=>v!=null))*1.2;
+  const n=vals.length;
+  const xAt=i=> pad + (W-2*pad)*(n<=1?0.5:i/(n-1));
+  const yAt=v=> H-pad - (H-2*pad)*(v/max);
+  // линия цели
+  const goalY = opt.goal ? yAt(opt.goal) : null;
+  // строим путь только по существующим точкам
+  let path='', pts='';
+  vals.forEach((v,i)=>{
+    if(v==null) return;
+    const x=xAt(i), y=yAt(v);
+    path += (path?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';
+    pts += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${opt.color}"/>`;
+  });
+  const labels = axisLabels(days);
+  return `<svg viewBox="0 0 ${W} ${H+16}">
+    ${goalY!=null?`<line x1="${pad}" y1="${goalY.toFixed(1)}" x2="${W-pad}" y2="${goalY.toFixed(1)}"
+      stroke="var(--line-solid)" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="${W-pad}" y="${(goalY-4).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--text-faint)">цель ${opt.goal}${opt.unit}</text>`:''}
+    <path d="${path}" fill="none" stroke="${opt.color}" stroke-width="2" stroke-linejoin="round"/>
+    ${pts}
+    ${labels}
+  </svg>`;
+}
+
+function barChart(vals, days, opt){
+  const W=300, H=90, pad=6;
+  const max=Math.max(opt.goal||0, ...vals.filter(v=>v!=null))*1.15 || 1;
+  const n=vals.length;
+  const bw=(W-2*pad)/n*0.6;
+  const gap=(W-2*pad)/n;
+  const goalY = opt.goal ? H-pad-(H-2*pad)*(opt.goal/max) : null;
+  let bars='';
+  vals.forEach((v,i)=>{
+    if(v==null) return;
+    const h=(H-2*pad)*(v/max);
+    const x=pad+gap*i+(gap-bw)/2;
+    const y=H-pad-h;
+    const col = (opt.goal && v>=opt.goal) ? opt.goalColor : opt.color;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="2" fill="${col}"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H+16}">
+    ${goalY!=null?`<line x1="${pad}" y1="${goalY.toFixed(1)}" x2="${W-pad}" y2="${goalY.toFixed(1)}"
+      stroke="var(--line-solid)" stroke-width="1" stroke-dasharray="4 4"/>`:''}
+    ${bars}
+    ${axisLabels(days)}
+  </svg>`;
+}
+
+// подписи оси X: показываем несколько дат, чтобы не налезали
+function axisLabels(days){
+  const n=days.length, W=300, pad=6;
+  const step = n<=7 ? 1 : Math.ceil(n/6);
+  let out='';
+  days.forEach((d,i)=>{
+    if(i%step!==0 && i!==n-1) return;
+    const x=pad+(W-2*pad)*(n<=1?0.5:i/(n-1));
+    out += `<text x="${x.toFixed(1)}" y="104" text-anchor="middle" font-size="8" fill="var(--text-faint)">${d.date.getDate()}</text>`;
+  });
+  return out;
+}
+
+function emptyChart(){
+  return `<div class="stat-empty">Недостаточно данных для графика</div>`;
+}
+
+/* склонение: 1 ночь, 2 ночи, 5 ночей */
+function plur(n, one, few, many){
+  const m10=n%10, m100=n%100;
+  if(m10===1 && m100!==11) return one;
+  if(m10>=2 && m10<=4 && (m100<10||m100>=20)) return few;
+  return many;
+}
 </script>
 </body>
 </html>
