@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ritmika">
+<meta name="theme-color" content="#14130f">
+<title>Ritmika</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: #14130f;
+    --bg-soft: #1c1a15;
+    --surface: #211e18;
+    --surface-2: #2a2620;
+    --line: #34302838;
+    --line-solid: #3a352c;
+    --text: #f0ebe0;
+    --text-dim: #a49d8b;
+    --text-faint: #6b6555;
+    --brass: #c9a25e;
+    --brass-soft: #e0c288;
+    /* модульные акценты */
+    --sleep: #7b7af0;
+    --food: #7fc98a;
+    --steps: #e0a45e;
+    --habit: #d98080;
+    --radius: 16px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* ---- светлая тема ---- */
+  [data-theme="light"] {
+    --bg: #f5f2ea;
+    --bg-soft: #efe9dc;
+    --surface: #ffffff;
+    --surface-2: #f0ebe0;
+    --line: #d9d2c220;
+    --line-solid: #ddd5c4;
+    --text: #24211a;
+    --text-dim: #6b6555;
+    --text-faint: #a49d8b;
+    --brass: #a9793a;
+    --brass-soft: #c9a25e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    overscroll-behavior: none; -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    padding: calc(var(--safe-top) + 8px) 0 var(--safe-bottom);
+    max-width: 620px; margin: 0 auto; position: relative; overflow-x: hidden;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 18px 4px;
+  }
+  .icon-btn {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: transparent; border: none; cursor: pointer;
+    display: grid; place-items: center; color: var(--text-dim);
+    transition: .15s;
+  }
+  .icon-btn:active { background: var(--surface); color: var(--text); }
+  .brand {
+    font-size: 25px; font-weight: 650; letter-spacing: .01em;
+    color: var(--text); display: inline-flex; align-items: center; gap: 7px;
+  }
+  .brand .word { line-height: 1; }
+  .brand b { color: var(--brass); font-weight: 650; font-style: normal; }
+  .brand .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--brass);
+    box-shadow: 0 0 0 0 var(--brass);
+    animation: pulse-ring 2.4s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(201,162,94,.5); }
+    70%  { box-shadow: 0 0 0 7px rgba(201,162,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(201,162,94,0); }
+  }
+  .menu-lines { display: flex; flex-direction: column; gap: 4px; width: 20px; }
+  .menu-lines span { height: 2px; background: currentColor; border-radius: 2px; }
+  .menu-lines span:nth-child(2) { width: 70%; }
+  .gear { width: 22px; height: 22px; border: 2px solid currentColor; border-radius: 50%;
+    position: relative; }
+  .gear::after { content:''; position:absolute; inset: 4px; border-radius: 50%;
+    border: 2px solid currentColor; opacity: .4; }
+
+  /* ---------- Clock hero ---------- */
+  .hero {
+    text-align: center; padding: 40px 20px 30px;
+  }
+  .hero .date {
+    font-size: 14px; color: var(--text-dim); letter-spacing: .08em;
+    text-transform: lowercase; margin-bottom: 10px;
+  }
+  .hero .clock {
+    font-family: "SF Mono", ui-monospace, "Menlo", monospace;
+    font-size: clamp(64px, 22vw, 108px); font-weight: 200;
+    letter-spacing: -0.02em; line-height: .95;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex; align-items: baseline;
+    position: relative; /* якорь для секунд */
+  }
+  .hero .clock .sep {
+    color: var(--brass); animation: blink 2s ease-in-out infinite;
+    margin: 0 .04em; font-weight: 200;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
+  .hero .clock .sec {
+    position: absolute; left: 100%; top: 0;
+    font-size: .3em; color: var(--text-faint); font-weight: 300;
+    margin-left: .12em; letter-spacing: 0;
+  }
+  .hero .greeting {
+    margin-top: 14px; font-size: 14px; color: var(--text-faint);
+  }
+  .divider {
+    width: 40px; height: 1px; background: var(--line-solid);
+    margin: 4px auto 0; position: relative;
+  }
+  .divider::after {
+    content: '+'; position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%); color: var(--text-faint);
+    font-size: 12px; background: var(--bg); padding: 0 4px;
+  }
+
+  /* ---------- Cards ---------- */
+  .section-label {
+    padding: 0 20px; font-size: 12px; color: var(--text-faint);
+    letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding: 0 16px 30px;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px; min-height: 96px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    cursor: pointer; transition: .15s; position: relative; overflow: hidden;
+  }
+  .card:active { background: var(--surface-2); transform: scale(.99); }
+  .card .card-top {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .card .card-name { font-size: 13px; color: var(--text-dim); }
+  .card .card-val {
+    font-size: 26px; font-weight: 600; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .card .card-sub { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
+  .card.placeholder { border-style: dashed; justify-content: center;
+    align-items: center; color: var(--text-faint); }
+  .card.placeholder .plus { font-size: 24px; font-weight: 300; }
+  .card.placeholder .ph-label { font-size: 12px; margin-top: 4px; }
+
+  /* accent tints */
+  .card[data-mod="sleep"] .dot { background: var(--sleep); }
+  .card[data-mod="food"]  .dot { background: var(--food); }
+  .card[data-mod="steps"] .dot { background: var(--steps); }
+  .card[data-mod="habit"] .dot { background: var(--habit); }
+
+  /* ---------- Side drawer ---------- */
+  .scrim {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 40;
+    backdrop-filter: blur(2px);
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 78%; max-width: 320px;
+    background: var(--bg-soft); border-right: 1px solid var(--line-solid);
+    transform: translateX(-100%); transition: transform .28s cubic-bezier(.4,0,.2,1);
+    z-index: 41; padding: calc(var(--safe-top) + 24px) 0 var(--safe-bottom);
+    display: flex; flex-direction: column;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { padding: 0 24px 20px; border-bottom: 1px solid var(--line); }
+  .drawer-head .dh-brand { font-size: 20px; font-weight: 600; letter-spacing: .04em; }
+  .drawer-head .dh-brand b { color: var(--brass); }
+  .drawer-head .dh-sub { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
+  .nav { padding: 14px 12px; flex: 1; overflow-y: auto; }
+  .nav-item {
+    display: flex; align-items: center; gap: 14px; padding: 13px 14px;
+    border-radius: 11px; cursor: pointer; color: var(--text-dim); transition: .15s;
+    font-size: 15px;
+  }
+  .nav-item:active { background: var(--surface); }
+  .nav-item.active { background: var(--surface); color: var(--text); }
+  .nav-item .ni-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .nav-item .ni-soon {
+    margin-left: auto; font-size: 10px; color: var(--text-faint);
+    border: 1px solid var(--line-solid); padding: 2px 7px; border-radius: 20px;
+  }
+  .drawer-foot {
+    padding: 16px 24px; border-top: 1px solid var(--line);
+    font-size: 12px; color: var(--text-faint);
+  }
+
+  /* ---------- Settings sheet ---------- */
+  .sheet-scrim {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    display: none; align-items: flex-end; justify-content: center; z-index: 50;
+    backdrop-filter: blur(2px);
+  }
+  .sheet-scrim.open { display: flex; }
+  .sheet {
+    background: var(--bg-soft); border: 1px solid var(--line-solid); border-bottom: none;
+    border-radius: 20px 20px 0 0; width: 100%; max-width: 620px;
+    padding: 22px 22px calc(24px + var(--safe-bottom));
+  }
+  .sheet h3 { font-size: 17px; margin-bottom: 16px; }
+  .set-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0; border-bottom: 1px solid var(--line);
+  }
+  .set-row:last-of-type { border-bottom: none; }
+  .set-row .sr-label { font-size: 15px; }
+  .set-row .sr-sub { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+  .toggle {
+    width: 46px; height: 28px; border-radius: 20px; background: var(--surface-2);
+    border: 1px solid var(--line-solid); position: relative; cursor: pointer; transition: .2s;
+  }
+  .toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--text-dim); transition: .2s;
+  }
+  .toggle.on { background: var(--brass); border-color: var(--brass); }
+  .toggle.on::after { transform: translateX(18px); background: #fff; }
+  /* сегменты выбора темы */
+  .seg { display: flex; background: var(--surface-2); border: 1px solid var(--line-solid);
+    border-radius: 10px; padding: 3px; gap: 2px; }
+  .seg button {
+    border: none; background: transparent; color: var(--text-dim);
+    font-size: 12px; font-family: inherit; padding: 6px 10px; border-radius: 8px;
+    cursor: pointer; transition: .15s; font-weight: 500;
+  }
+  .seg button.active { background: var(--brass); color: #fff; }
+  .sheet-close {
+    width: 100%; margin-top: 18px; padding: 13px; border-radius: 11px;
+    background: var(--surface); border: 1px solid var(--line-solid); color: var(--text);
+    font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  /* ---------- Screens ---------- */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* карточка текущего времени в модулях */
+  .now-card {
+    margin: 14px 20px 0; padding: 14px 16px; border-radius: 14px;
+    background: var(--surface); border: 1px solid var(--line-solid);
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .now-card .nc-time {
+    font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .now-card .nc-date { font-size: 13px; color: var(--text-dim); }
+  .now-card .nc-label {
+    margin-left: auto; font-size: 11px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+
+  /* заголовок вкладки */
+  .module-head { padding: 22px 20px 4px; }
+  .module-title { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; }
+  .module-sub { font-size: 13px; color: var(--text-dim); margin-top: 3px; }
+
+  /* кнопки Уснул / Проснулся */
+  .sleep-actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding: 18px 20px 8px;
+  }
+  .sleep-btn {
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 14px; padding: 16px 14px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+    transition: .15s; font-family: inherit; text-align: left;
+    position: relative; overflow: hidden;
+  }
+  .sleep-btn:active { background: var(--surface-2); transform: scale(.99); }
+  /* прозрачный datetime-input поверх всей кнопки — гарантирует открытие пикера на iOS */
+  .sleep-btn .sb-input {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; border: none; margin: 0; padding: 0;
+    cursor: pointer; -webkit-appearance: none; appearance: none;
+    color-scheme: dark;
+  }
+  .sleep-btn .sb-icon {
+    width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+    font-size: 16px;
+  }
+  .sleep-btn.bed .sb-icon { background: #2a2740; color: var(--sleep); }
+  .sleep-btn.wake .sb-icon { background: #3a3320; color: var(--steps); }
+  .sleep-btn .sb-label { font-size: 15px; font-weight: 600; color: var(--text); }
+  .sleep-btn .sb-val { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .sleep-btn .sb-val.empty { color: var(--text-faint); }
+
+  /* модалка выбора даты-времени */
+  .dtp-scrim {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: none; align-items: center; justify-content: center; z-index: 60;
+    backdrop-filter: blur(3px); padding: 20px;
+  }
+  .dtp-scrim.open { display: flex; }
+  .dtp {
+    background: var(--bg-soft); border: 1px solid var(--line-solid);
+    border-radius: 20px; padding: 22px; width: 100%; max-width: 380px;
+  }
+  .dtp-title { font-size: 18px; font-weight: 650; margin-bottom: 18px; }
+  .dtp-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;
+  }
+  .dtp-grid.time { grid-template-columns: 1fr 1fr; }
+  .dtp-col label {
+    display: block; font-size: 11px; color: var(--text-faint); margin-bottom: 5px;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .dtp-col select {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--line-solid);
+    color: var(--text); border-radius: 10px; padding: 11px 8px; font-size: 16px;
+    font-family: inherit; -webkit-appearance: none; appearance: none;
+    text-align: center; cursor: pointer; font-variant-numeric: tabular-nums;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a49d8b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .dtp-col select:focus { outline: none; border-color: var(--brass); }
+  .dtp-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .dtp-actions button {
+    flex: 1; padding: 13px; border-radius: 11px; font-size: 15px; font-weight: 600;
+    font-family: inherit; cursor: pointer; border: none;
+  }
+  .dtp-cancel { background: var(--surface); color: var(--text-dim); border: 1px solid var(--line-solid) !important; }
+  .dtp-ok { background: var(--sleep); color: #fff; }
+
+  /* строка «записать сон» когда обе кнопки заполнены */
+  .save-strip {
+    margin: 4px 20px 0; padding: 12px; border-radius: 12px;
+    background: var(--sleep); color: #fff; text-align: center; font-weight: 600;
+    font-size: 14px; cursor: pointer; display: none;
+  }
+  .save-strip.show { display: block; }
+  .save-strip.dim { background: var(--surface); color: var(--text-faint);
+    border: 1px solid var(--line-solid); cursor: default; }
+
+  /* навигация по месяцу */
+  .month-bar {
+    display: flex; align-items: center; justify-content: center; gap: 18px;
+    padding: 20px 20px 12px;
+  }
+  .month-bar button {
+    background: var(--surface); border: 1px solid var(--line-solid); color: var(--text-dim);
+    width: 34px; height: 34px; border-radius: 10px; font-size: 17px; cursor: pointer;
+    display: grid; place-items: center; transition: .15s;
+  }
+  .month-bar button:active { background: var(--surface-2); color: var(--text); }
+  .month-bar .mb-label {
+    font-size: 15px; font-weight: 600; min-width: 150px; text-align: center;
+    text-transform: capitalize; font-variant-numeric: tabular-nums;
+  }
+
+  /* дневник-лента */
+  .diary-hours {
+    display: flex; align-items: flex-end; gap: 8px;
+    padding: 0 20px 6px;
+  }
+  .dh-pad { width: 24px; flex-shrink: 0; }
+  .dh-scale {
+    flex: 1; display: grid; grid-template-columns: repeat(18, 1fr);
+    font-size: 7.5px; color: var(--text-faint); font-variant-numeric: tabular-nums;
+    margin-right: 30px;
+  }
+  .dh-scale span { position: relative; left: -3px; }
+  .dh-scale span.mid { color: var(--sleep); font-weight: 700; }
+
+  .diary { padding: 0 20px 40px; display: flex; flex-direction: column; gap: 5px; }
+  .drow { display: flex; align-items: center; gap: 8px; padding-right: 30px; }
+  .drow .dnum {
+    width: 24px; flex-shrink: 0; font-size: 11px; color: var(--text-dim);
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .drow.today .dnum { color: var(--sleep); font-weight: 700; }
+  .dtrack {
+    position: relative; flex: 1; height: 20px;
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 6px; overflow: hidden; cursor: pointer;
+    background-image: repeating-linear-gradient(to right,
+      transparent 0, transparent calc(100%/18 - 1px),
+      var(--line) calc(100%/18 - 1px), var(--line) calc(100%/18));
+  }
+  /* пунктирные маркеры окна сна: 23:00 (индекс 5) и 08:00 (индекс 14) */
+  .dtrack::before {
+    content:''; position:absolute; top:0; bottom:0; width:0;
+    left: calc(100%/18*5);
+    border-left: 1px dashed var(--text-faint); opacity:.6;
+  }
+  .dtrack::after {
+    content:''; position:absolute; top:0; bottom:0; width:0;
+    left: calc(100%/18*14);
+    border-left: 1px dashed var(--text-faint); opacity:.6;
+  }
+  .dbar {
+    position: absolute; top: 2px; bottom: 2px; border-radius: 4px;
+    background: linear-gradient(180deg, #9d9cf5, var(--sleep));
+    box-shadow: 0 0 8px -2px var(--sleep); opacity: .92;
+  }
+  /* цвет по длительности сна */
+  .dbar.q-bad  { background: linear-gradient(180deg,#f0776f,#e0534a); box-shadow:0 0 8px -2px #e0534a; }   /* 0–2 ч */
+  .dbar.q-low  { background: linear-gradient(180deg,#f0a86f,#e08a3e); box-shadow:0 0 8px -2px #e08a3e; }   /* 3–4 ч */
+  .dbar.q-mid  { background: linear-gradient(180deg,#f0d572,#e0c04a); box-shadow:0 0 8px -2px #e0c04a; }   /* 5–6 ч */
+  .dbar.q-good { background: linear-gradient(180deg,#8fd99a,#5fbf74); box-shadow:0 0 8px -2px #5fbf74; }   /* 7+ ч  */
+  .dbar.wl { border-top-left-radius:0; border-bottom-left-radius:0; }
+  .dbar.wr { border-top-right-radius:0; border-bottom-right-radius:0; }
+  .ddur {
+    position:absolute; right:-28px; top:50%; transform:translateY(-50%);
+    font-size:10px; color:var(--text-dim); width:26px; font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- Вкладка Шаги ---------- */
+  .steps-add-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 16px 20px 0; width: calc(100% - 40px);
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 14px; padding: 15px; cursor: pointer;
+    color: var(--text); font-size: 15px; font-weight: 600; font-family: inherit;
+    transition: .15s;
+  }
+  .steps-add-btn:active { background: var(--surface-2); transform: scale(.99); }
+  .steps-add-btn .sab-plus {
+    display: grid; place-items: center; width: 24px; height: 24px;
+    background: #3a3320; color: var(--steps); border-radius: 7px; font-size: 17px;
+  }
+  .step-input {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--line-solid);
+    color: var(--text); border-radius: 10px; padding: 13px 12px; font-size: 18px;
+    font-family: inherit; font-variant-numeric: tabular-nums; text-align: center;
+    -webkit-appearance: none; appearance: none;
+  }
+  .step-input:focus { outline: none; border-color: var(--steps); }
+
+  /* шкала сверху */
+  .steps-scale-row { display: flex; padding: 0 20px 4px; }
+  .ssr-pad { width: 30px; flex-shrink: 0; }
+  .ssr-scale {
+    flex: 1; display: flex; justify-content: space-between;
+    font-size: 9px; color: var(--text-faint); font-variant-numeric: tabular-nums;
+  }
+
+  /* строки график шагов */
+  .steps-chart { padding: 0 20px 40px; display: flex; flex-direction: column; gap: 4px; }
+  .schart-row { display: flex; align-items: center; gap: 8px; }
+  .schart-row .sc-day {
+    width: 22px; flex-shrink: 0; font-size: 11px; color: var(--text-dim);
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .schart-row.today .sc-day { color: var(--steps); font-weight: 700; }
+  .sc-track {
+    position: relative; flex: 1; height: 20px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 5px; overflow: hidden; cursor: pointer;
+  }
+  .sc-bar {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, #c98a4e, var(--steps));
+    border-radius: 4px; min-width: 2px; transition: width .3s ease;
+  }
+  .sc-bar.goal { background: linear-gradient(90deg, #8fd99a, #5fbf74); } /* цель достигнута */
+  .sc-val {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums;
+    color: var(--text); left: 8px; text-shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+  .sc-track.empty .sc-val { color: var(--text-faint); text-shadow: none; }
+
+  /* ---------- Вкладка Питание ---------- */
+  .food-top {
+    display: flex; gap: 16px; padding: 18px 20px 8px; align-items: center;
+  }
+  .cal-ring-wrap { position: relative; width: 150px; height: 150px; flex-shrink: 0; }
+  .cal-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .cal-ring .ring-bg {
+    fill: none; stroke: var(--surface-2); stroke-width: 10;
+  }
+  .cal-ring .ring-fg {
+    fill: none; stroke: var(--food); stroke-width: 10; stroke-linecap: round;
+    stroke-dasharray: 326.7; stroke-dashoffset: 326.7;
+    transition: stroke-dashoffset .5s ease, stroke .3s ease;
+  }
+  .cal-ring-center {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .cal-ring-center .crc-fact {
+    font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .cal-ring-center .crc-norm {
+    font-size: 11px; color: var(--text-dim); margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .macros { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .macro {
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 11px; padding: 9px 11px;
+  }
+  .macro-label { font-size: 11px; color: var(--text-dim); margin-bottom: 3px; }
+  .macro-val { font-size: 14px; font-variant-numeric: tabular-nums; }
+  .macro-val b { font-weight: 700; }
+  .macro-val span { color: var(--text-faint); font-size: 12px; margin-left: 2px; }
+  .macro-bar {
+    height: 4px; background: var(--surface-2); border-radius: 3px;
+    margin-top: 6px; overflow: hidden;
+  }
+  .macro-bar span {
+    display: block; height: 100%; border-radius: 3px; width: 0;
+    transition: width .4s ease, background .3s ease;
+  }
+  .macro[data-m="p"] .macro-bar span { background: #7b9df0; }
+  .macro[data-m="f"] .macro-bar span { background: #e0a45e; }
+  .macro[data-m="c"] .macro-bar span { background: #8fd99a; }
+
+  .food-actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    padding: 12px 20px 4px;
+  }
+  .food-btn {
+    padding: 13px; border-radius: 12px; font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer; transition: .15s;
+  }
+  .food-btn.plan { background: var(--surface); border: 1px solid var(--line-solid); color: var(--text); }
+  .food-btn.add { background: var(--food); border: none; color: #14130f; }
+  .food-btn:active { transform: scale(.99); }
+
+  .food-list-label {
+    padding: 18px 20px 10px; font-size: 12px; color: var(--text-faint);
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .food-list { padding: 0 20px 40px; display: flex; flex-direction: column; gap: 8px; }
+  .food-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .food-item .fi-num {
+    width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0;
+    background: var(--surface-2); color: var(--text-dim);
+    display: grid; place-items: center; font-size: 12px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .food-item .fi-body { flex: 1; min-width: 0; }
+  .food-item .fi-name {
+    font-size: 14px; font-weight: 500; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .food-item .fi-macros { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
+  .food-item .fi-cal {
+    font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; flex-shrink: 0;
+  }
+  .food-item .fi-del {
+    width: 28px; height: 28px; flex-shrink: 0; border: none; background: transparent;
+    color: var(--text-faint); font-size: 18px; cursor: pointer; border-radius: 7px;
+  }
+  .food-item .fi-del:active { background: var(--surface-2); color: #f0716d; }
+  .food-empty {
+    text-align: center; color: var(--text-faint); font-size: 13px; padding: 24px 0;
+  }
+
+  /* сетка полей плана/продукта 2x2 */
+  .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
+
+  /* ---------- Вкладка Привычки ---------- */
+  .habit-days-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 20px 10px;
+  }
+  .habit-days-nav .hdn-range {
+    font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums;
+  }
+  .habit-days-nav .hdn-btns { display: flex; gap: 6px; }
+  .habit-days-nav button {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--line-solid); color: var(--text-dim);
+    font-size: 15px; cursor: pointer; display: grid; place-items: center;
+  }
+  .habit-days-nav button:active { background: var(--surface-2); color: var(--text); }
+
+  .habit-table-wrap { padding: 0 20px; overflow-x: auto; }
+  .habit-table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+  .habit-table th, .habit-table td {
+    border: 1px solid var(--line-solid); padding: 0; text-align: center;
+  }
+  .habit-table th.h-name-col, .habit-table td.h-name-col {
+    width: 90px; text-align: left; padding: 8px 8px; font-weight: 500;
+    font-size: 12px; color: var(--text); position: sticky; left: 0;
+    background: var(--surface); cursor: pointer;
+  }
+  .habit-table th.h-name-col { background: var(--bg); color: var(--text-faint);
+    font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .habit-table th.h-day {
+    font-size: 11px; color: var(--text-dim); font-weight: 600; padding: 7px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .habit-table th.h-day.today { color: var(--habit); }
+  .habit-table td.h-cell {
+    height: 38px; cursor: pointer; transition: background .12s;
+  }
+  .habit-table td.h-cell:active { background: var(--surface-2); }
+  .habit-table td.h-cell .mark {
+    display: inline-block; width: 18px; height: 18px; border-radius: 5px;
+    line-height: 18px; font-size: 13px;
+  }
+  .habit-table td.h-cell.done .mark {
+    background: var(--habit); color: #fff;
+  }
+  .habit-table td.h-cell.today-col { background: rgba(217,128,128,.06); }
+  .habit-name-ellipsis {
+    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .habit-add-btn {
+    display: block; margin: 16px 20px 0; width: calc(100% - 40px);
+    background: var(--surface); border: 1px dashed var(--line-solid);
+    border-radius: 12px; padding: 14px; cursor: pointer;
+    color: var(--habit); font-size: 14px; font-weight: 600; font-family: inherit;
+    transition: .15s;
+  }
+  .habit-add-btn:active { background: var(--surface-2); }
+  .habit-empty {
+    text-align: center; color: var(--text-faint); font-size: 13px; padding: 20px;
+  }
+  .habit-delete {
+    width: 100%; margin-top: 12px; padding: 12px; border-radius: 11px;
+    background: transparent; border: 1px solid #3a2730; color: #f0716d;
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand .pulse { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <button class="icon-btn" id="menuBtn" aria-label="Меню">
+    <span class="menu-lines"><span></span><span></span><span></span></span>
+  </button>
+  <div class="brand" id="brand"><span class="word">ritm<b>i</b>ka</span><span class="pulse"></span></div>
+  <button class="icon-btn" id="settingsBtn" aria-label="Настройки">
+    <span class="gear"></span>
+  </button>
+</div>
+
+<!-- ============ ЭКРАН: ГЛАВНАЯ ============ -->
+<div class="screen active" id="screen-home">
+
+<!-- Clock hero -->
+<div class="hero">
+  <div class="date" id="date">—</div>
+  <div class="clock" id="clock">
+    <span id="hh">00</span><span class="sep">:</span><span id="mm">00</span><span class="sec" id="ss">00</span>
+  </div>
+  <div class="divider"></div>
+  <div class="greeting" id="greeting"></div>
+</div>
+
+<!-- Cards -->
+<div class="section-label">сегодня</div>
+<div class="cards" id="cards">
+  <div class="card" data-mod="steps">
+    <div class="card-top"><span class="dot"></span><span class="card-name">Шаги</span></div>
+    <div><div class="card-val" id="v-steps">—</div><div class="card-sub">цель 8 000</div></div>
+  </div>
+  <div class="card" data-mod="food">
+    <div class="card-top"><span class="dot"></span><span class="card-name">Калории</span></div>
+    <div><div class="card-val" id="v-food">—</div><div class="card-sub">из 3150 ккал</div></div>
+  </div>
+  <div class="card" data-mod="sleep">
+    <div class="card-top"><span class="dot"></span><span class="card-name">Сон</span></div>
+    <div><div class="card-val" id="v-sleep">—</div><div class="card-sub">прошлой ночью</div></div>
+  </div>
+  <div class="card" data-mod="habit">
+    <div class="card-top"><span class="dot"></span><span class="card-name">Привычки</span></div>
+    <div><div class="card-val" id="v-habit">—</div><div class="card-sub">выполнено</div></div>
+  </div>
+</div>
+</div><!-- /screen-home -->
+
+<!-- ============ ЭКРАН: СОН ============ -->
+<div class="screen" id="screen-sleep">
+  <div class="module-head">
+    <div class="module-title">Дневник сна</div>
+    <div class="module-sub">Отметь, когда уснул и когда проснулся</div>
+  </div>
+
+  <div class="now-card">
+    <span class="nc-time" id="ncTime">00:00</span>
+    <span class="nc-date" id="ncDate">—</span>
+    <span class="nc-label">сейчас</span>
+  </div>
+
+  <div class="sleep-actions">
+    <button class="sleep-btn bed" id="btnBed" type="button">
+      <span class="sb-icon">☾</span>
+      <span class="sb-label">Уснул</span>
+      <span class="sb-val empty" id="bedVal">не отмечено</span>
+    </button>
+    <button class="sleep-btn wake" id="btnWake" type="button">
+      <span class="sb-icon">☀</span>
+      <span class="sb-label">Проснулся</span>
+      <span class="sb-val empty" id="wakeVal">не отмечено</span>
+    </button>
+  </div>
+  <div class="save-strip" id="saveStrip">Записать сон</div>
+
+  <div class="month-bar">
+    <button id="mPrev">‹</button>
+    <span class="mb-label" id="mLabel">—</span>
+    <button id="mNext">›</button>
+  </div>
+
+  <div class="diary-hours">
+    <div class="dh-pad"></div>
+    <div class="dh-scale" id="dhScale"></div>
+  </div>
+  <div class="diary" id="diary"></div>
+</div>
+
+<!-- ============ ЭКРАН: ШАГИ ============ -->
+<div class="screen" id="screen-steps">
+  <div class="module-head">
+    <div class="module-title">Шаги</div>
+    <div class="module-sub">Отмечай, сколько прошёл за день</div>
+  </div>
+
+  <div class="now-card">
+    <span class="nc-time" id="ncTimeSteps">00:00</span>
+    <span class="nc-date" id="ncDateSteps">—</span>
+    <span class="nc-label">сейчас</span>
+  </div>
+
+  <button class="steps-add-btn" id="stepsAddBtn" type="button">
+    <span class="sab-plus">+</span> Записать шаги за день
+  </button>
+
+  <div class="month-bar">
+    <button id="smPrev">‹</button>
+    <span class="mb-label" id="smLabel">—</span>
+    <button id="smNext">›</button>
+  </div>
+
+  <!-- шкала сверху -->
+  <div class="steps-scale-row">
+    <div class="ssr-pad"></div>
+    <div class="ssr-scale" id="stepsScale"></div>
+  </div>
+  <!-- строки день + бар -->
+  <div class="steps-chart" id="stepsChart"></div>
+</div>
+
+<!-- ============ ЭКРАН: ПИТАНИЕ ============ -->
+<div class="screen" id="screen-food">
+  <div class="module-head">
+    <div class="module-title">Дневник питания</div>
+    <div class="module-sub">Записывай, что съел за день</div>
+  </div>
+
+  <div class="now-card">
+    <span class="nc-time" id="ncTimeFood">00:00</span>
+    <span class="nc-date" id="ncDateFood">—</span>
+    <span class="nc-label">сейчас</span>
+  </div>
+
+  <!-- переключение дня -->
+  <div class="month-bar">
+    <button id="fdPrev">‹</button>
+    <span class="mb-label" id="fdLabel">—</span>
+    <button id="fdNext">›</button>
+  </div>
+
+  <!-- кольцо калорий + БЖУ -->
+  <div class="food-top">
+    <div class="cal-ring-wrap">
+      <svg class="cal-ring" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="52"/>
+        <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"/>
+      </svg>
+      <div class="cal-ring-center">
+        <div class="crc-fact" id="calFact">0</div>
+        <div class="crc-norm" id="calNorm">/ 3150 ккал</div>
+      </div>
+    </div>
+    <div class="macros">
+      <div class="macro" data-m="p">
+        <div class="macro-label">Белки</div>
+        <div class="macro-val"><b id="pFact">0</b><span id="pNorm">/ 165 г</span></div>
+        <div class="macro-bar"><span id="pBar"></span></div>
+      </div>
+      <div class="macro" data-m="f">
+        <div class="macro-label">Жиры</div>
+        <div class="macro-val"><b id="fFact">0</b><span id="fNorm">/ 85 г</span></div>
+        <div class="macro-bar"><span id="fBar"></span></div>
+      </div>
+      <div class="macro" data-m="c">
+        <div class="macro-label">Углеводы</div>
+        <div class="macro-val"><b id="cFact">0</b><span id="cNorm">/ 430 г</span></div>
+        <div class="macro-bar"><span id="cBar"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="food-actions">
+    <button class="food-btn plan" id="planBtn" type="button">Изменить план</button>
+    <button class="food-btn add" id="foodAddBtn" type="button">+ Добавить продукт</button>
+  </div>
+
+  <div class="food-list-label">Съедено за день</div>
+  <div class="food-list" id="foodList"></div>
+</div>
+
+<!-- ============ ЭКРАН: ПРИВЫЧКИ ============ -->
+<div class="screen" id="screen-habit">
+  <div class="module-head">
+    <div class="module-title">Привычки</div>
+    <div class="module-sub">Отмечай, что выполнил каждый день</div>
+  </div>
+
+  <div class="now-card">
+    <span class="nc-time" id="ncTimeHabit">00:00</span>
+    <span class="nc-date" id="ncDateHabit">—</span>
+    <span class="nc-label">сейчас</span>
+  </div>
+
+  <div class="month-bar">
+    <button id="hbPrev">‹</button>
+    <span class="mb-label" id="hbLabel">—</span>
+    <button id="hbNext">›</button>
+  </div>
+
+  <!-- окно из 10 дней с пагинацией -->
+  <div class="habit-days-nav">
+    <span class="hdn-range" id="hbRange">1–10</span>
+    <div class="hdn-btns">
+      <button id="hbDaysPrev" type="button">‹</button>
+      <button id="hbDaysNext" type="button">›</button>
+    </div>
+  </div>
+
+  <div class="habit-table-wrap">
+    <table class="habit-table" id="habitTable"></table>
+  </div>
+
+  <button class="habit-add-btn" id="habitAddBtn" type="button">+ Добавить привычку</button>
+</div>
+
+<!-- Модалка выбора даты и времени -->
+<div class="dtp-scrim" id="dtpScrim">
+  <div class="dtp">
+    <div class="dtp-title" id="dtpTitle">Когда уснул</div>
+    <div class="dtp-grid">
+      <div class="dtp-col">
+        <label>День</label>
+        <select id="dtpDay"></select>
+      </div>
+      <div class="dtp-col">
+        <label>Месяц</label>
+        <select id="dtpMonth"></select>
+      </div>
+      <div class="dtp-col">
+        <label>Год</label>
+        <select id="dtpYear"></select>
+      </div>
+    </div>
+    <div class="dtp-grid time">
+      <div class="dtp-col">
+        <label>Час</label>
+        <select id="dtpHour"></select>
+      </div>
+      <div class="dtp-col">
+        <label>Минута</label>
+        <select id="dtpMin"></select>
+      </div>
+    </div>
+    <div class="dtp-actions">
+      <button class="dtp-cancel" id="dtpCancel" type="button">Отмена</button>
+      <button class="dtp-ok" id="dtpOk" type="button">Готово</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка ввода шагов -->
+<div class="dtp-scrim" id="stepScrim">
+  <div class="dtp">
+    <div class="dtp-title">Шаги за день</div>
+    <div class="dtp-col" style="margin-bottom:14px">
+      <label>Дата</label>
+      <div class="dtp-grid">
+        <select id="stDay"></select>
+        <select id="stMonth"></select>
+        <select id="stYear"></select>
+      </div>
+    </div>
+    <div class="dtp-col">
+      <label>Количество шагов</label>
+      <input type="number" id="stCount" inputmode="numeric" pattern="[0-9]*"
+             placeholder="напр. 8500" class="step-input">
+    </div>
+    <div class="dtp-actions">
+      <button class="dtp-cancel" id="stCancel" type="button">Отмена</button>
+      <button class="dtp-ok" id="stOk" type="button" style="background:var(--steps)">Готово</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка: изменить план (нормы) -->
+<div class="dtp-scrim" id="planScrim">
+  <div class="dtp">
+    <div class="dtp-title">Дневная норма</div>
+    <div class="plan-grid">
+      <div class="dtp-col">
+        <label>Калории, ккал</label>
+        <input type="number" id="planCal" inputmode="numeric" class="step-input">
+      </div>
+      <div class="dtp-col">
+        <label>Белки, г</label>
+        <input type="number" id="planP" inputmode="numeric" class="step-input">
+      </div>
+      <div class="dtp-col">
+        <label>Жиры, г</label>
+        <input type="number" id="planF" inputmode="numeric" class="step-input">
+      </div>
+      <div class="dtp-col">
+        <label>Углеводы, г</label>
+        <input type="number" id="planC" inputmode="numeric" class="step-input">
+      </div>
+    </div>
+    <div class="dtp-actions">
+      <button class="dtp-cancel" id="planCancel" type="button">Отмена</button>
+      <button class="dtp-ok" id="planOk" type="button" style="background:var(--food)">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка: добавить продукт -->
+<div class="dtp-scrim" id="foodScrim">
+  <div class="dtp">
+    <div class="dtp-title" id="foodModalTitle">Добавить продукт</div>
+    <div class="dtp-col" style="margin-bottom:12px">
+      <label>Название</label>
+      <input type="text" id="foodName" placeholder="напр. Гречка с курицей" class="step-input" style="text-align:left;font-size:16px">
+    </div>
+    <div class="plan-grid">
+      <div class="dtp-col">
+        <label>Калории, ккал</label>
+        <input type="number" id="foodCal" inputmode="numeric" class="step-input">
+      </div>
+      <div class="dtp-col">
+        <label>Белки, г</label>
+        <input type="number" id="foodP" inputmode="numeric" class="step-input">
+      </div>
+      <div class="dtp-col">
+        <label>Жиры, г</label>
+        <input type="number" id="foodF" inputmode="numeric" class="step-input">
+      </div>
+      <div class="dtp-col">
+        <label>Углеводы, г</label>
+        <input type="number" id="foodC" inputmode="numeric" class="step-input">
+      </div>
+    </div>
+    <div class="dtp-actions">
+      <button class="dtp-cancel" id="foodCancel" type="button">Отмена</button>
+      <button class="dtp-ok" id="foodOk" type="button" style="background:var(--food)">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка: добавить/переименовать привычку -->
+<div class="dtp-scrim" id="habitScrim">
+  <div class="dtp">
+    <div class="dtp-title" id="habitModalTitle">Новая привычка</div>
+    <div class="dtp-col" style="margin-bottom:6px">
+      <label>Название</label>
+      <input type="text" id="habitName" placeholder="напр. Зарядка" class="step-input" style="text-align:left;font-size:16px">
+    </div>
+    <div class="dtp-actions">
+      <button class="dtp-cancel" id="habitCancel" type="button">Отмена</button>
+      <button class="dtp-ok" id="habitOk" type="button" style="background:var(--habit)">Готово</button>
+    </div>
+    <button class="habit-delete" id="habitDelete" type="button" style="display:none">Удалить привычку</button>
+  </div>
+</div>
+
+<!-- Drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="dh-brand">ritm<b>i</b>ka</div>
+    <div class="dh-sub">твой день под контролем</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" data-screen="home"><span class="ni-dot" style="background:var(--brass)"></span>Главная</div>
+    <div class="nav-item" data-screen="sleep"><span class="ni-dot" style="background:var(--sleep)"></span>Сон</div>
+    <div class="nav-item" data-screen="food"><span class="ni-dot" style="background:var(--food)"></span>Питание</div>
+    <div class="nav-item" data-screen="steps"><span class="ni-dot" style="background:var(--steps)"></span>Шаги</div>
+    <div class="nav-item" data-screen="habit"><span class="ni-dot" style="background:var(--habit)"></span>Привычки</div>
+  </nav>
+  <div class="drawer-foot">Ritmika · версия 0.1</div>
+</aside>
+
+<!-- Settings sheet -->
+<div class="sheet-scrim" id="settingsScrim">
+  <div class="sheet">
+    <h3>Настройки</h3>
+    <div class="set-row">
+      <div><div class="sr-label">Тема</div><div class="sr-sub">оформление приложения</div></div>
+      <div class="seg" id="themeSeg">
+        <button data-theme-val="dark">Тёмная</button>
+        <button data-theme-val="light">Светлая</button>
+        <button data-theme-val="auto">Авто</button>
+      </div>
+    </div>
+    <div class="set-row">
+      <div><div class="sr-label">Секунды на часах</div><div class="sr-sub">показывать точное время</div></div>
+      <div class="toggle on" id="tglSeconds"></div>
+    </div>
+    <div class="set-row">
+      <div><div class="sr-label">24-часовой формат</div><div class="sr-sub">иначе AM / PM</div></div>
+      <div class="toggle on" id="tglFormat"></div>
+    </div>
+    <div class="set-row">
+      <div><div class="sr-label">Приветствие по времени</div><div class="sr-sub">доброе утро / вечер</div></div>
+      <div class="toggle on" id="tglGreeting"></div>
+    </div>
+    <button class="sheet-close" id="settingsClose">Готово</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   FOCUSOR — главный экран
+   Настройки хранятся локально; логика модулей добавится позже.
+   Работает и в Telegram (тема/haptic), и как PWA в Safari.
+   ============================================================ */
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+function haptic(t='light'){ tg?.HapticFeedback?.impactOccurred?.(t); }
+
+/* ---- настройки ---- */
+const SETTINGS_KEY = 'FOCUSOR_SETTINGS';
+let settings = { seconds: true, h24: true, greeting: true, theme: 'dark' };
+try {
+  const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
+  if (s) settings = { ...settings, ...s };
+} catch {}
+function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+/* ---- тема ---- */
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
+function applyTheme(){
+  let mode = settings.theme;
+  if (mode === 'auto') mode = prefersLight.matches ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', mode);
+  // подгоняем цвет статус-бара
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', mode === 'light' ? '#f5f2ea' : '#14130f');
+  // в Telegram красим шапку/фон под тему
+  try {
+    tg?.setBackgroundColor?.(mode === 'light' ? '#f5f2ea' : '#14130f');
+    tg?.setHeaderColor?.(mode === 'light' ? '#f5f2ea' : '#14130f');
+  } catch {}
+}
+applyTheme();
+// если выбран авто — реагируем на смену системной темы
+prefersLight.addEventListener('change', () => { if (settings.theme === 'auto') applyTheme(); });
+
+/* ---- часы ---- */
+const MONTHS = ['января','февраля','марта','апреля','мая','июня',
+  'июля','августа','сентября','октября','ноября','декабря'];
+const MONTHS_NOM = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+  'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const WEEKDAYS = ['воскресенье','понедельник','вторник','среда',
+  'четверг','пятница','суббота'];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function tick(){
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+
+  let hStr;
+  if (settings.h24) hStr = pad(h);
+  else { const h12 = h % 12 || 12; hStr = pad(h12); }
+
+  document.getElementById('hh').textContent = hStr;
+  document.getElementById('mm').textContent = pad(m);
+  const secEl = document.getElementById('ss');
+  if (settings.seconds) { secEl.style.display=''; secEl.textContent = pad(s); }
+  else secEl.style.display = 'none';
+
+  // дата
+  document.getElementById('date').textContent =
+    `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+
+  // карточка времени в модулях
+  const nt = document.getElementById('ncTime');
+  if (nt) {
+    nt.textContent = `${pad(h)}:${pad(m)}`;
+    document.getElementById('ncDate').textContent =
+      `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  }
+  const nts = document.getElementById('ncTimeSteps');
+  if (nts) {
+    nts.textContent = `${pad(h)}:${pad(m)}`;
+    document.getElementById('ncDateSteps').textContent =
+      `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  }
+  const ntf = document.getElementById('ncTimeFood');
+  if (ntf) {
+    ntf.textContent = `${pad(h)}:${pad(m)}`;
+    document.getElementById('ncDateFood').textContent =
+      `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  }
+  const nth = document.getElementById('ncTimeHabit');
+  if (nth) {
+    nth.textContent = `${pad(h)}:${pad(m)}`;
+    document.getElementById('ncDateHabit').textContent =
+      `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  }
+
+  // приветствие
+  const g = document.getElementById('greeting');
+  if (settings.greeting) {
+    let word;
+    if (h < 5) word = 'доброй ночи';
+    else if (h < 12) word = 'доброе утро';
+    else if (h < 18) word = 'добрый день';
+    else word = 'добрый вечер';
+    g.textContent = word;
+    g.style.display = '';
+  } else g.style.display = 'none';
+}
+tick();
+setInterval(tick, 1000);
+
+/* ---- меню (drawer) ---- */
+const scrim = document.getElementById('scrim');
+const drawer = document.getElementById('drawer');
+function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('open'); haptic(); }
+function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('open'); }
+document.getElementById('menuBtn').addEventListener('click', openDrawer);
+scrim.addEventListener('click', closeDrawer);
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.screen;
+    // все модули теперь готовы
+    const ready = ['home','sleep','steps','food','habit'];
+    if (!ready.includes(target)) {
+      haptic(); closeDrawer(); return;
+    }
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    showScreen(target);
+    haptic();
+    setTimeout(closeDrawer, 150);
+  });
+});
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name)?.classList.add('active');
+  document.body.setAttribute('data-screen', name);
+  window.scrollTo(0, 0);
+  if (name === 'sleep') renderDiary();
+  if (name === 'steps') renderSteps();
+  if (name === 'food') renderFood();
+  if (name === 'habit') renderHabits();
+}
+
+/* ---- настройки sheet ---- */
+const setScrim = document.getElementById('settingsScrim');
+document.getElementById('settingsBtn').addEventListener('click', ()=>{ setScrim.classList.add('open'); haptic(); });
+document.getElementById('settingsClose').addEventListener('click', ()=> setScrim.classList.remove('open'));
+setScrim.addEventListener('click', e => { if (e.target === setScrim) setScrim.classList.remove('open'); });
+
+function bindToggle(id, key){
+  const el = document.getElementById(id);
+  el.classList.toggle('on', settings[key]);
+  el.addEventListener('click', () => {
+    settings[key] = !settings[key];
+    el.classList.toggle('on', settings[key]);
+    saveSettings(); tick(); haptic();
+  });
+}
+bindToggle('tglSeconds','seconds');
+bindToggle('tglFormat','h24');
+bindToggle('tglGreeting','greeting');
+
+/* сегменты темы */
+const themeSeg = document.getElementById('themeSeg');
+function syncThemeSeg(){
+  themeSeg.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b.dataset.themeVal === settings.theme));
+}
+syncThemeSeg();
+themeSeg.querySelectorAll('button').forEach(b => {
+  b.addEventListener('click', () => {
+    settings.theme = b.dataset.themeVal;
+    syncThemeSeg(); applyTheme(); saveSettings(); haptic();
+  });
+});
+
+/* ---- карточки на главной ведут в модули ---- */
+document.querySelectorAll('#screen-home .card').forEach(c => {
+  c.addEventListener('click', () => {
+    haptic();
+    const mod = c.dataset.mod;
+    if (mod === 'sleep') {
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      document.querySelector('.nav-item[data-screen="sleep"]').classList.add('active');
+      showScreen('sleep');
+    } else if (mod === 'steps') {
+      // сразу открываем ввод шагов за сегодня
+      openStepModal(new Date());
+    } else if (mod === 'food') {
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      document.querySelector('.nav-item[data-screen="food"]').classList.add('active');
+      showScreen('food');
+    } else if (mod === 'habit') {
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      document.querySelector('.nav-item[data-screen="habit"]').classList.add('active');
+      showScreen('habit');
+    }
+  });
+});
+
+/* ============================================================
+   МОДУЛЬ: ДНЕВНИК СНА
+   Хранилище: Telegram CloudStorage или localStorage (фолбэк).
+   Запись: { id, bed: ISO, wake: ISO }
+   ============================================================ */
+const SLEEP_KEY = 'RITMIKA_SLEEP';
+const cloud = tg?.CloudStorage;
+const hasCloud = !!(cloud && typeof cloud.getItem === 'function');
+let SLEEP = [];
+let sYear, sMonth;
+let pendingBed = null, pendingWake = null; // выбранные, но не сохранённые
+
+const TL_START = 18, TL_HOURS = 18; // лента 18:00 → 12:00
+
+function sleepLoad(){
+  return new Promise(res => {
+    if (hasCloud) cloud.getItem(SLEEP_KEY, (e,v) => {
+      if (e || !v) return res([]);
+      try { res(JSON.parse(v)); } catch { res([]); }
+    });
+    else { try { res(JSON.parse(localStorage.getItem(SLEEP_KEY) || '[]')); } catch { res([]); } }
+  });
+}
+function sleepSave(){
+  const str = JSON.stringify(SLEEP);
+  if (hasCloud) cloud.setItem(SLEEP_KEY, str, ()=>{});
+  else localStorage.setItem(SLEEP_KEY, str);
+}
+
+function dKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function toInput(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function fmtDur(min){ const h=Math.floor(min/60), m=Math.round(min%60); return m?`${h}ч ${m}м`:`${h}ч`; }
+function fmtDT(d){ return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}, ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+
+/* --- кнопки Уснул / Проснулся открывают собственную модалку --- */
+function defaultBed(){ const d=new Date(); d.setHours(23,0,0,0); d.setDate(d.getDate()-1); return d; }
+function defaultWake(){ const d=new Date(); d.setHours(7,0,0,0); return d; }
+
+const dtpScrim = document.getElementById('dtpScrim');
+const dtpDay = document.getElementById('dtpDay');
+const dtpMonth = document.getElementById('dtpMonth');
+const dtpYear = document.getElementById('dtpYear');
+const dtpHour = document.getElementById('dtpHour');
+const dtpMin = document.getElementById('dtpMin');
+let dtpTarget = null; // 'bed' | 'wake'
+
+// заполняем выпадающие списки один раз
+function fillOptions(sel, from, to, fmt){
+  for (let i=from; i<=to; i++){
+    const o=document.createElement('option');
+    o.value=i; o.textContent = fmt ? fmt(i) : i;
+    sel.appendChild(o);
+  }
+}
+fillOptions(dtpDay, 1, 31);
+MONTHS_NOM.forEach((name, i) => {
+  const o=document.createElement('option'); o.value=i; o.textContent=name; dtpMonth.appendChild(o);
+});
+const nowY = new Date().getFullYear();
+fillOptions(dtpYear, nowY-2, nowY+1);
+fillOptions(dtpHour, 0, 23, v=>pad(v));
+fillOptions(dtpMin, 0, 59, v=>pad(v));
+
+function openDTP(target){
+  dtpTarget = target;
+  const base = target === 'bed'
+    ? (pendingBed || defaultBed())
+    : (pendingWake || defaultWake());
+  dtpDay.value = base.getDate();
+  dtpMonth.value = base.getMonth();
+  dtpYear.value = base.getFullYear();
+  dtpHour.value = base.getHours();
+  dtpMin.value = base.getMinutes();
+  document.getElementById('dtpTitle').textContent =
+    target === 'bed' ? 'Когда уснул' : 'Когда проснулся';
+  dtpScrim.classList.add('open');
+  haptic();
+}
+function closeDTP(){ dtpScrim.classList.remove('open'); dtpTarget=null; }
+
+document.getElementById('btnBed').addEventListener('click', ()=>openDTP('bed'));
+document.getElementById('btnWake').addEventListener('click', ()=>openDTP('wake'));
+document.getElementById('dtpCancel').addEventListener('click', closeDTP);
+dtpScrim.addEventListener('click', e => { if (e.target === dtpScrim) closeDTP(); });
+
+document.getElementById('dtpOk').addEventListener('click', () => {
+  const d = new Date(
+    +dtpYear.value, +dtpMonth.value, +dtpDay.value,
+    +dtpHour.value, +dtpMin.value, 0, 0
+  );
+  // защита от несуществующих дат (31 фев -> откатится) — берём как есть, Date нормализует
+  if (dtpTarget === 'bed') pendingBed = d;
+  else pendingWake = d;
+  updateSleepButtons();
+  haptic('medium');
+  closeDTP();
+});
+
+function updateSleepButtons(){
+  const bv = document.getElementById('bedVal');
+  const wv = document.getElementById('wakeVal');
+  if (pendingBed){ bv.textContent = fmtDT(pendingBed); bv.classList.remove('empty'); }
+  else { bv.textContent = 'не отмечено'; bv.classList.add('empty'); }
+  if (pendingWake){ wv.textContent = fmtDT(pendingWake); wv.classList.remove('empty'); }
+  else { wv.textContent = 'не отмечено'; wv.classList.add('empty'); }
+
+  const strip = document.getElementById('saveStrip');
+  if (pendingBed && pendingWake){
+    if (pendingWake <= pendingBed){
+      strip.className = 'save-strip show dim';
+      strip.textContent = 'Пробуждение должно быть позже';
+    } else {
+      const dur = (pendingWake - pendingBed)/60000;
+      strip.className = 'save-strip show';
+      strip.textContent = `Записать сон · ${fmtDur(dur)}`;
+    }
+  } else {
+    strip.className = 'save-strip';
+  }
+}
+
+document.getElementById('saveStrip').addEventListener('click', () => {
+  if (!pendingBed || !pendingWake || pendingWake <= pendingBed) return;
+  SLEEP.push({ id: Date.now().toString(36), bed: pendingBed.toISOString(), wake: pendingWake.toISOString() });
+  sleepSave();
+  haptic('medium');
+  // всегда показываем месяц, в котором пробуждение — чтобы новая запись была видна
+  sYear = pendingWake.getFullYear();
+  sMonth = pendingWake.getMonth();
+  pendingBed = null; pendingWake = null;
+  updateSleepButtons();
+  // двойная гарантия перерисовки: сразу и на следующем кадре
+  renderDiary();
+  requestAnimationFrame(renderDiary);
+  syncHomeSleepCard();
+});
+
+/* --- навигация по месяцам --- */
+document.getElementById('mPrev').addEventListener('click', () => {
+  sMonth--; if (sMonth<0){ sMonth=11; sYear--; } renderDiary(); haptic();
+});
+document.getElementById('mNext').addEventListener('click', () => {
+  sMonth++; if (sMonth>11){ sMonth=0; sYear++; } renderDiary(); haptic();
+});
+
+/* --- шкала часов --- */
+function renderHourScale(){
+  const el = document.getElementById('dhScale');
+  if (el.childElementCount) return; // один раз
+  for (let i=0;i<TL_HOURS;i++){
+    const hr=(TL_START+i)%24;
+    const s=document.createElement('span');
+    s.textContent=pad(hr);
+    if (hr===0) s.classList.add('mid');
+    el.appendChild(s);
+  }
+}
+
+/* --- отрисовка дневника --- */
+function renderDiary(){
+  renderHourScale();
+  document.getElementById('mLabel').textContent =
+    `${MONTHS_NOM[sMonth]} ${sYear}`;
+
+  const diary = document.getElementById('diary');
+  diary.innerHTML='';
+  const days = new Date(sYear, sMonth+1, 0).getDate();
+  const today = new Date();
+  const isThis = today.getFullYear()===sYear && today.getMonth()===sMonth;
+
+  const byWake={};
+  SLEEP.forEach(r => { byWake[dKey(new Date(r.wake))] = r; });
+
+  for (let day=1; day<=days; day++){
+    const ds=`${sYear}-${pad(sMonth+1)}-${pad(day)}`;
+    const rec=byWake[ds];
+    const row=document.createElement('div');
+    row.className='drow'+(isThis && day===today.getDate()?' today':'');
+    const num=document.createElement('div'); num.className='dnum'; num.textContent=day;
+    row.appendChild(num);
+    const track=document.createElement('div'); track.className='dtrack';
+    if (rec){
+      const bed=new Date(rec.bed), wake=new Date(rec.wake);
+      const dm=(wake-bed)/60000;
+      drawDiaryBar(track, bed, wake, dm);
+      track.addEventListener('click', ()=>editRec(rec));
+    } else {
+      track.addEventListener('click', ()=>quickPick(sYear,sMonth,day));
+    }
+    row.appendChild(track);
+    diary.appendChild(row);
+  }
+}
+
+function drawDiaryBar(track, bed, wake, dm){
+  const wd=new Date(wake.getFullYear(),wake.getMonth(),wake.getDate());
+  const start=new Date(wd); start.setDate(start.getDate()-1); start.setHours(TL_START,0,0,0);
+  const end=new Date(start); end.setHours(start.getHours()+TL_HOURS);
+  const total=end-start;
+  let s=(bed-start)/total, e=(wake-start)/total;
+  const cs=Math.max(0,Math.min(1,s)), ce=Math.max(0,Math.min(1,e));
+  if (ce<=cs) return;
+  const bar=document.createElement('div'); bar.className='dbar';
+  // цвет по длительности: 0–2 красный, 3–4 оранжевый, 5–6 жёлтый, 7+ зелёный
+  const hrs = dm/60;
+  if (hrs < 3) bar.classList.add('q-bad');
+  else if (hrs < 5) bar.classList.add('q-low');
+  else if (hrs < 7) bar.classList.add('q-mid');
+  else bar.classList.add('q-good');
+  if (s<0) bar.classList.add('wl');
+  if (e>1) bar.classList.add('wr');
+  bar.style.left=(cs*100)+'%'; bar.style.width=((ce-cs)*100)+'%';
+  const dur=document.createElement('div'); dur.className='ddur';
+  dur.textContent=(dm/60).toFixed(1).replace('.0','')+'ч';
+  track.appendChild(bar); track.appendChild(dur);
+}
+
+/* быстрый ввод по клику на пустой день */
+function quickPick(y,m,day){
+  const wake=new Date(y,m,day,7,0);
+  const bed=new Date(y,m,day,23,0); bed.setDate(bed.getDate()-1);
+  pendingBed=bed; pendingWake=wake;
+  updateSleepButtons();
+  document.querySelector('.sleep-actions').scrollIntoView({behavior:'smooth',block:'center'});
+  haptic();
+}
+
+/* редактирование записи через prompt-подтверждение (удаление) */
+function editRec(rec){
+  const bed=new Date(rec.bed), wake=new Date(rec.wake);
+  const ok=confirm(`Сон ${fmtDT(bed)} → ${fmtDT(wake)} (${fmtDur((wake-bed)/60000)})\n\nУдалить эту запись?`);
+  if (ok){
+    SLEEP=SLEEP.filter(r=>r.id!==rec.id);
+    sleepSave(); haptic('heavy'); renderDiary(); syncHomeSleepCard();
+  }
+}
+
+/* обновить карточку сна на главной (последняя ночь) */
+function syncHomeSleepCard(){
+  if (!SLEEP.length){ document.getElementById('v-sleep').textContent='—'; return; }
+  const last=[...SLEEP].sort((a,b)=>new Date(b.wake)-new Date(a.wake))[0];
+  const dur=(new Date(last.wake)-new Date(last.bed))/60000;
+  document.getElementById('v-sleep').textContent=fmtDur(dur);
+}
+
+/* инициализация модуля сна */
+(async function initSleep(){
+  const now=new Date(); sYear=now.getFullYear(); sMonth=now.getMonth();
+  SLEEP=await sleepLoad();
+  syncHomeSleepCard();
+  // если вкладка сна уже открыта к моменту загрузки — перерисуем с данными
+  if (document.body.getAttribute('data-screen') === 'sleep') renderDiary();
+})();
+
+/* ============================================================
+   МОДУЛЬ: ШАГИ
+   Хранилище STEPS: { 'YYYY-MM-DD': количество }
+   Цель по умолчанию 8000; шкала графика 2к..16к
+   ============================================================ */
+const STEPS_KEY = 'RITMIKA_STEPS';
+const STEP_GOAL = 8000;
+const STEP_SCALE_MAX = 16000; // предел шкалы графика
+let STEPS = {};
+let stYear, stMonth;
+
+function stepsLoad(){
+  return new Promise(res => {
+    if (hasCloud) cloud.getItem(STEPS_KEY, (e,v)=>{
+      if (e||!v) return res({});
+      try { res(JSON.parse(v)); } catch { res({}); }
+    });
+    else { try { res(JSON.parse(localStorage.getItem(STEPS_KEY)||'{}')); } catch { res({}); } }
+  });
+}
+function stepsSave(){
+  const str=JSON.stringify(STEPS);
+  if (hasCloud) cloud.setItem(STEPS_KEY, str, ()=>{});
+  else localStorage.setItem(STEPS_KEY, str);
+}
+function fmtSteps(n){ return n.toLocaleString('ru-RU'); }
+
+/* --- модалка ввода шагов --- */
+const stepScrim = document.getElementById('stepScrim');
+const stDay=document.getElementById('stDay'), stMonthSel=document.getElementById('stMonth'),
+      stYearSel=document.getElementById('stYear'), stCount=document.getElementById('stCount');
+
+// заполняем селекты даты
+for(let i=1;i<=31;i++){ const o=document.createElement('option'); o.value=i;o.textContent=i; stDay.appendChild(o); }
+MONTHS_NOM.forEach((n,i)=>{ const o=document.createElement('option'); o.value=i;o.textContent=n; stMonthSel.appendChild(o); });
+{ const y=new Date().getFullYear(); for(let i=y-2;i<=y+1;i++){ const o=document.createElement('option'); o.value=i;o.textContent=i; stYearSel.appendChild(o);} }
+
+function openStepModal(dateObj){
+  const d = dateObj || new Date();
+  stDay.value=d.getDate(); stMonthSel.value=d.getMonth(); stYearSel.value=d.getFullYear();
+  // если запись на эту дату есть — подставим
+  const key=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  stCount.value = STEPS[key] || '';
+  stepScrim.classList.add('open');
+  setTimeout(()=>stCount.focus(), 100);
+  haptic();
+}
+function closeStepModal(){ stepScrim.classList.remove('open'); }
+
+document.getElementById('stepsAddBtn').addEventListener('click', ()=>openStepModal(new Date()));
+document.getElementById('stCancel').addEventListener('click', closeStepModal);
+stepScrim.addEventListener('click', e=>{ if(e.target===stepScrim) closeStepModal(); });
+
+document.getElementById('stOk').addEventListener('click', ()=>{
+  const n = parseInt(stCount.value, 10);
+  const key = `${stYearSel.value}-${pad(+stMonthSel.value+1)}-${pad(+stDay.value)}`;
+  if (isNaN(n) || n < 0){ delete STEPS[key]; } // пусто = удалить запись
+  else STEPS[key] = n;
+  stepsSave();
+  haptic('medium');
+  closeStepModal();
+  syncHomeStepsCard();
+  if (document.body.getAttribute('data-screen')==='steps') renderSteps();
+});
+
+/* --- навигация по месяцам --- */
+document.getElementById('smPrev').addEventListener('click', ()=>{
+  stMonth--; if(stMonth<0){stMonth=11;stYear--;} renderSteps(); haptic();
+});
+document.getElementById('smNext').addEventListener('click', ()=>{
+  stMonth++; if(stMonth>11){stMonth=0;stYear++;} renderSteps(); haptic();
+});
+
+/* --- шкала сверху (2к, 4к, ... 16к) --- */
+function renderStepsScale(){
+  const el=document.getElementById('stepsScale');
+  if (el.childElementCount) return;
+  for(let k=2; k<=16; k+=2){
+    const s=document.createElement('span'); s.textContent=k+'к'; el.appendChild(s);
+  }
+}
+
+/* --- отрисовка графика шагов --- */
+function renderSteps(){
+  renderStepsScale();
+  document.getElementById('smLabel').textContent = `${MONTHS_NOM[stMonth]} ${stYear}`;
+
+  const chart=document.getElementById('stepsChart');
+  chart.innerHTML='';
+  const days=new Date(stYear, stMonth+1, 0).getDate();
+  const today=new Date();
+  const isThis = today.getFullYear()===stYear && today.getMonth()===stMonth;
+
+  for(let day=1; day<=days; day++){
+    const key=`${stYear}-${pad(stMonth+1)}-${pad(day)}`;
+    const val=STEPS[key];
+    const row=document.createElement('div');
+    row.className='schart-row'+(isThis && day===today.getDate()?' today':'');
+    const dn=document.createElement('div'); dn.className='sc-day'; dn.textContent=day;
+    row.appendChild(dn);
+    const track=document.createElement('div'); track.className='sc-track'+(val?'':' empty');
+    if (val){
+      const bar=document.createElement('div');
+      bar.className='sc-bar'+(val>=STEP_GOAL?' goal':'');
+      const pct=Math.min(100, (val/STEP_SCALE_MAX)*100);
+      bar.style.width=pct+'%';
+      track.appendChild(bar);
+      const vlabel=document.createElement('div'); vlabel.className='sc-val';
+      vlabel.textContent=fmtSteps(val);
+      track.appendChild(vlabel);
+    }
+    track.addEventListener('click', ()=>openStepModal(new Date(stYear, stMonth, day)));
+    row.appendChild(track);
+    chart.appendChild(row);
+  }
+}
+
+/* --- карточка шагов на главной (сегодня) --- */
+function syncHomeStepsCard(){
+  const now=new Date();
+  const key=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const val=STEPS[key];
+  document.getElementById('v-steps').textContent = val ? fmtSteps(val) : '—';
+}
+
+/* инициализация модуля шагов */
+(async function initSteps(){
+  const now=new Date(); stYear=now.getFullYear(); stMonth=now.getMonth();
+  STEPS=await stepsLoad();
+  syncHomeStepsCard();
+  if (document.body.getAttribute('data-screen')==='steps') renderSteps();
+})();
+
+/* ============================================================
+   МОДУЛЬ: ПИТАНИЕ
+   PLAN: {cal,p,f,c} — дневные нормы
+   FOOD: { 'YYYY-MM-DD': [ {id,name,cal,p,f,c}, ... ] }
+   ============================================================ */
+const PLAN_KEY='RITMIKA_PLAN', FOOD_KEY='RITMIKA_FOOD';
+let PLAN={cal:3150,p:165,f:85,c:430};
+let FOOD={};
+let fdDate; // отображаемый день (Date)
+const RING_LEN=2*Math.PI*52; // длина окружности r=52
+
+function planLoad(){
+  return new Promise(res=>{
+    if (hasCloud) cloud.getItem(PLAN_KEY,(e,v)=>{ if(e||!v)return res(null); try{res(JSON.parse(v))}catch{res(null)} });
+    else { try{res(JSON.parse(localStorage.getItem(PLAN_KEY)||'null'))}catch{res(null)} }
+  });
+}
+function planSave(){ const s=JSON.stringify(PLAN); if(hasCloud)cloud.setItem(PLAN_KEY,s,()=>{}); else localStorage.setItem(PLAN_KEY,s); }
+function foodLoad(){
+  return new Promise(res=>{
+    if (hasCloud) cloud.getItem(FOOD_KEY,(e,v)=>{ if(e||!v)return res({}); try{res(JSON.parse(v))}catch{res({})} });
+    else { try{res(JSON.parse(localStorage.getItem(FOOD_KEY)||'{}'))}catch{res({})} }
+  });
+}
+function foodSave(){ const s=JSON.stringify(FOOD); if(hasCloud)cloud.setItem(FOOD_KEY,s,()=>{}); else localStorage.setItem(FOOD_KEY,s); }
+
+function fdKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function num(v){ const n=parseInt(v,10); return isNaN(n)?0:Math.max(0,n); }
+
+/* цвет заполнения по проценту от нормы: <50 оранжевый, 50-85 жёлтый, 85+ зелёный */
+function fillColor(pct){
+  if (pct < 50) return '#e0a45e';
+  if (pct < 85) return '#e0c04a';
+  return '#5fbf74';
+}
+
+/* --- переключение дня --- */
+document.getElementById('fdPrev').addEventListener('click', ()=>{
+  fdDate.setDate(fdDate.getDate()-1); renderFood(); haptic();
+});
+document.getElementById('fdNext').addEventListener('click', ()=>{
+  fdDate.setDate(fdDate.getDate()+1); renderFood(); haptic();
+});
+
+/* --- модалка плана --- */
+const planScrim=document.getElementById('planScrim');
+document.getElementById('planBtn').addEventListener('click', ()=>{
+  document.getElementById('planCal').value=PLAN.cal;
+  document.getElementById('planP').value=PLAN.p;
+  document.getElementById('planF').value=PLAN.f;
+  document.getElementById('planC').value=PLAN.c;
+  planScrim.classList.add('open'); haptic();
+});
+document.getElementById('planCancel').addEventListener('click', ()=>planScrim.classList.remove('open'));
+planScrim.addEventListener('click', e=>{ if(e.target===planScrim) planScrim.classList.remove('open'); });
+document.getElementById('planOk').addEventListener('click', ()=>{
+  PLAN={
+    cal:num(document.getElementById('planCal').value)||3150,
+    p:num(document.getElementById('planP').value)||1,
+    f:num(document.getElementById('planF').value)||1,
+    c:num(document.getElementById('planC').value)||1
+  };
+  planSave(); haptic('medium');
+  planScrim.classList.remove('open');
+  renderFood(); syncHomeFoodCard();
+  // обновим подпись норм на карточке главной
+  document.querySelector('#screen-home .card[data-mod="food"] .card-sub').textContent = `из ${PLAN.cal} ккал`;
+});
+
+/* --- модалка добавления продукта --- */
+const foodScrim=document.getElementById('foodScrim');
+function clearFoodModal(){
+  ['foodName','foodCal','foodP','foodF','foodC'].forEach(id=>document.getElementById(id).value='');
+}
+document.getElementById('foodAddBtn').addEventListener('click', ()=>{
+  clearFoodModal();
+  foodScrim.classList.add('open');
+  setTimeout(()=>document.getElementById('foodName').focus(),100);
+  haptic();
+});
+document.getElementById('foodCancel').addEventListener('click', ()=>foodScrim.classList.remove('open'));
+foodScrim.addEventListener('click', e=>{ if(e.target===foodScrim) foodScrim.classList.remove('open'); });
+document.getElementById('foodOk').addEventListener('click', ()=>{
+  const name=document.getElementById('foodName').value.trim() || 'Без названия';
+  const item={
+    id:Date.now().toString(36),
+    name,
+    cal:num(document.getElementById('foodCal').value),
+    p:num(document.getElementById('foodP').value),
+    f:num(document.getElementById('foodF').value),
+    c:num(document.getElementById('foodC').value)
+  };
+  const key=fdKey(fdDate);
+  if(!FOOD[key]) FOOD[key]=[];
+  FOOD[key].push(item);
+  foodSave(); haptic('medium');
+  foodScrim.classList.remove('open');
+  renderFood(); syncHomeFoodCard();
+});
+
+/* --- отрисовка вкладки питания --- */
+function renderFood(){
+  if(!fdDate) fdDate=new Date();
+  // подпись дня
+  const today=new Date();
+  const isToday = fdKey(fdDate)===fdKey(today);
+  document.getElementById('fdLabel').textContent = isToday
+    ? 'Сегодня'
+    : `${fdDate.getDate()} ${MONTHS[fdDate.getMonth()]}`;
+
+  const key=fdKey(fdDate);
+  const items=FOOD[key]||[];
+  const sum=items.reduce((a,x)=>({cal:a.cal+x.cal,p:a.p+x.p,f:a.f+x.f,c:a.c+x.c}),{cal:0,p:0,f:0,c:0});
+
+  // кольцо калорий
+  const calPct=Math.min(100,(sum.cal/PLAN.cal)*100);
+  const ring=document.getElementById('ringFg');
+  ring.style.strokeDashoffset = RING_LEN*(1-calPct/100);
+  ring.style.stroke = fillColor(calPct);
+  document.getElementById('calFact').textContent = sum.cal;
+  document.getElementById('calNorm').textContent = `/ ${PLAN.cal} ккал`;
+
+  // БЖУ
+  const setMacro=(pref,fact,norm)=>{
+    document.getElementById(pref+'Fact').textContent=fact;
+    document.getElementById(pref+'Norm').textContent=`/ ${norm} г`;
+    const pct=Math.min(100,(fact/norm)*100);
+    document.getElementById(pref+'Bar').style.width=pct+'%';
+  };
+  setMacro('p',sum.p,PLAN.p);
+  setMacro('f',sum.f,PLAN.f);
+  setMacro('c',sum.c,PLAN.c);
+
+  // список продуктов
+  const list=document.getElementById('foodList');
+  list.innerHTML='';
+  if(!items.length){
+    list.innerHTML='<div class="food-empty">Пока ничего не добавлено.<br>Нажми «Добавить продукт».</div>';
+  } else {
+    items.forEach((it,i)=>{
+      const row=document.createElement('div'); row.className='food-item';
+      row.innerHTML=`
+        <div class="fi-num">${i+1}</div>
+        <div class="fi-body">
+          <div class="fi-name">${escapeHtml(it.name)}</div>
+          <div class="fi-macros">Б ${it.p} · Ж ${it.f} · У ${it.c}</div>
+        </div>
+        <div class="fi-cal">${it.cal}</div>
+        <button class="fi-del" data-id="${it.id}" aria-label="Удалить">×</button>`;
+      list.appendChild(row);
+    });
+    list.querySelectorAll('.fi-del').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        FOOD[key]=FOOD[key].filter(x=>x.id!==btn.dataset.id);
+        if(!FOOD[key].length) delete FOOD[key];
+        foodSave(); haptic('heavy'); renderFood(); syncHomeFoodCard();
+      });
+    });
+  }
+}
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+/* карточка питания на главной (сегодня) */
+function syncHomeFoodCard(){
+  const key=fdKey(new Date());
+  const items=FOOD[key]||[];
+  const cal=items.reduce((a,x)=>a+x.cal,0);
+  document.getElementById('v-food').textContent = cal || '—';
+}
+
+/* инициализация модуля питания */
+(async function initFood(){
+  fdDate=new Date();
+  const p=await planLoad(); if(p) PLAN=p;
+  FOOD=await foodLoad();
+  // обновим подпись норм на главной
+  const sub=document.querySelector('#screen-home .card[data-mod="food"] .card-sub');
+  if(sub) sub.textContent=`из ${PLAN.cal} ккал`;
+  syncHomeFoodCard();
+  if (document.body.getAttribute('data-screen')==='food') renderFood();
+})();
+
+/* ============================================================
+   МОДУЛЬ: ПРИВЫЧКИ
+   HABITS: { list:[{id,name}], done:{ 'habitId|YYYY-MM-DD': true } }
+   Таблица: строки — привычки, столбцы — дни (окно по 10).
+   ============================================================ */
+const HABITS_KEY='RITMIKA_HABITS';
+let HABITS={list:[], done:{}};
+let hbYear, hbMonth, hbPage=0; // hbPage: 0 = дни 1–10, 1 = 11–20, 2 = 21–конец
+let editingHabitId=null;
+
+function habitsLoad(){
+  return new Promise(res=>{
+    if (hasCloud) cloud.getItem(HABITS_KEY,(e,v)=>{ if(e||!v)return res({list:[],done:{}}); try{res(JSON.parse(v))}catch{res({list:[],done:{}})} });
+    else { try{res(JSON.parse(localStorage.getItem(HABITS_KEY)||'{"list":[],"done":{}}'))}catch{res({list:[],done:{}})} }
+  });
+}
+function habitsSave(){ const s=JSON.stringify(HABITS); if(hasCloud)cloud.setItem(HABITS_KEY,s,()=>{}); else localStorage.setItem(HABITS_KEY,s); }
+
+function doneKey(hid,y,m,d){ return `${hid}|${y}-${pad(m+1)}-${pad(d)}`; }
+
+/* --- навигация по месяцам --- */
+document.getElementById('hbPrev').addEventListener('click', ()=>{
+  hbMonth--; if(hbMonth<0){hbMonth=11;hbYear--;} hbPage=0; renderHabits(); haptic();
+});
+document.getElementById('hbNext').addEventListener('click', ()=>{
+  hbMonth++; if(hbMonth>11){hbMonth=0;hbYear++;} hbPage=0; renderHabits(); haptic();
+});
+/* --- пагинация по 10 дней --- */
+document.getElementById('hbDaysPrev').addEventListener('click', ()=>{
+  if(hbPage>0){ hbPage--; renderHabits(); haptic(); }
+});
+document.getElementById('hbDaysNext').addEventListener('click', ()=>{
+  const daysInMonth=new Date(hbYear,hbMonth+1,0).getDate();
+  const maxPage=Math.floor((daysInMonth-1)/10);
+  if(hbPage<maxPage){ hbPage++; renderHabits(); haptic(); }
+});
+
+/* --- модалка привычки --- */
+const habitScrim=document.getElementById('habitScrim');
+document.getElementById('habitAddBtn').addEventListener('click', ()=>{
+  editingHabitId=null;
+  document.getElementById('habitModalTitle').textContent='Новая привычка';
+  document.getElementById('habitName').value='';
+  document.getElementById('habitDelete').style.display='none';
+  habitScrim.classList.add('open');
+  setTimeout(()=>document.getElementById('habitName').focus(),100);
+  haptic();
+});
+function openHabitEdit(hid){
+  const hab=HABITS.list.find(h=>h.id===hid); if(!hab) return;
+  editingHabitId=hid;
+  document.getElementById('habitModalTitle').textContent='Привычка';
+  document.getElementById('habitName').value=hab.name;
+  document.getElementById('habitDelete').style.display='';
+  habitScrim.classList.add('open');
+  haptic();
+}
+document.getElementById('habitCancel').addEventListener('click', ()=>habitScrim.classList.remove('open'));
+habitScrim.addEventListener('click', e=>{ if(e.target===habitScrim) habitScrim.classList.remove('open'); });
+document.getElementById('habitOk').addEventListener('click', ()=>{
+  const name=document.getElementById('habitName').value.trim();
+  if(!name){ habitScrim.classList.remove('open'); return; }
+  if(editingHabitId){
+    const hab=HABITS.list.find(h=>h.id===editingHabitId); if(hab) hab.name=name;
+  } else {
+    HABITS.list.push({id:Date.now().toString(36), name});
+  }
+  habitsSave(); haptic('medium');
+  habitScrim.classList.remove('open');
+  renderHabits(); syncHomeHabitCard();
+});
+document.getElementById('habitDelete').addEventListener('click', ()=>{
+  if(!editingHabitId) return;
+  HABITS.list=HABITS.list.filter(h=>h.id!==editingHabitId);
+  // чистим отметки этой привычки
+  Object.keys(HABITS.done).forEach(k=>{ if(k.startsWith(editingHabitId+'|')) delete HABITS.done[k]; });
+  habitsSave(); haptic('heavy');
+  habitScrim.classList.remove('open');
+  renderHabits(); syncHomeHabitCard();
+});
+
+/* --- отрисовка таблицы --- */
+function renderHabits(){
+  document.getElementById('hbLabel').textContent=`${MONTHS_NOM[hbMonth]} ${hbYear}`;
+  const daysInMonth=new Date(hbYear,hbMonth+1,0).getDate();
+  const startDay=hbPage*10+1;
+  const endDay=Math.min(startDay+9, daysInMonth);
+  document.getElementById('hbRange').textContent=`${startDay}–${endDay}`;
+
+  const today=new Date();
+  const isThisMonth = today.getFullYear()===hbYear && today.getMonth()===hbMonth;
+
+  const table=document.getElementById('habitTable');
+  table.innerHTML='';
+
+  if(!HABITS.list.length){
+    const wrap=document.querySelector('.habit-table-wrap');
+    table.innerHTML='';
+    // покажем подсказку вместо таблицы
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td class="habit-empty">Привычек пока нет.<br>Нажми «Добавить привычку» ниже.</td>';
+    table.appendChild(tr);
+    return;
+  }
+
+  // шапка: имя + дни
+  const thead=document.createElement('thead');
+  const htr=document.createElement('tr');
+  htr.innerHTML='<th class="h-name-col">Привычка</th>';
+  for(let d=startDay; d<=endDay; d++){
+    const th=document.createElement('th'); th.className='h-day';
+    if(isThisMonth && d===today.getDate()) th.classList.add('today');
+    th.textContent=d;
+    htr.appendChild(th);
+  }
+  thead.appendChild(htr);
+  table.appendChild(thead);
+
+  // строки привычек
+  const tbody=document.createElement('tbody');
+  HABITS.list.forEach(hab=>{
+    const tr=document.createElement('tr');
+    const nameTd=document.createElement('td');
+    nameTd.className='h-name-col';
+    nameTd.innerHTML=`<span class="habit-name-ellipsis">${escapeHtml(hab.name)}</span>`;
+    nameTd.addEventListener('click', ()=>openHabitEdit(hab.id));
+    tr.appendChild(nameTd);
+
+    for(let d=startDay; d<=endDay; d++){
+      const td=document.createElement('td');
+      td.className='h-cell';
+      if(isThisMonth && d===today.getDate()) td.classList.add('today-col');
+      const key=doneKey(hab.id, hbYear, hbMonth, d);
+      const done=!!HABITS.done[key];
+      td.innerHTML=`<span class="mark">${done?'✓':''}</span>`;
+      if(done) td.classList.add('done');
+      td.addEventListener('click', ()=>{
+        if(HABITS.done[key]) delete HABITS.done[key];
+        else HABITS.done[key]=true;
+        habitsSave(); haptic();
+        td.classList.toggle('done');
+        td.querySelector('.mark').textContent = HABITS.done[key]?'✓':'';
+        syncHomeHabitCard();
+      });
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+}
+
+/* карточка привычек на главной: сколько выполнено сегодня из всех */
+function syncHomeHabitCard(){
+  const el=document.getElementById('v-habit');
+  if(!HABITS.list.length){ el.textContent='—'; return; }
+  const now=new Date();
+  let done=0;
+  HABITS.list.forEach(h=>{
+    if(HABITS.done[doneKey(h.id, now.getFullYear(), now.getMonth(), now.getDate())]) done++;
+  });
+  el.textContent=`${done}/${HABITS.list.length}`;
+}
+
+/* инициализация модуля привычек */
+(async function initHabits(){
+  const now=new Date(); hbYear=now.getFullYear(); hbMonth=now.getMonth();
+  // сразу открываем страницу с текущим днём
+  hbPage=Math.floor((now.getDate()-1)/10);
+  HABITS=await habitsLoad();
+  if(!HABITS.list) HABITS.list=[];
+  if(!HABITS.done) HABITS.done={};
+  syncHomeHabitCard();
+  if (document.body.getAttribute('data-screen')==='habit') renderHabits();
+})();
+</script>
+</body>
+</html>
