@@ -27,6 +27,7 @@
     --food: #7fc98a;
     --steps: #e0a45e;
     --habit: #d98080;
+    --finance: #5ec9b0;
     --radius: 16px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -770,6 +771,88 @@
   .hs-item .hs-streak { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
   .stat-empty { text-align: center; color: var(--text-faint); font-size: 13px; padding: 10px 0; }
 
+  /* ---------- Вкладка Финансы ---------- */
+  .fin-balance {
+    margin: 4px 20px 0; background: var(--surface);
+    border: 1px solid var(--line-solid); border-radius: 16px; padding: 18px;
+  }
+  .fb-main { text-align: center; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .fb-label { font-size: 12px; color: var(--text-faint); letter-spacing: .05em; }
+  .fb-value {
+    font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .fb-value.neg { color: #f0716d; }
+  .fb-value.pos { color: var(--finance); }
+  .fb-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 14px; }
+  .fb-in, .fb-out { display: flex; align-items: center; gap: 10px; }
+  .fb-arrow {
+    width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+  .fb-in .fb-arrow { background: rgba(94,201,176,.15); color: var(--finance); }
+  .fb-out .fb-arrow { background: rgba(240,113,109,.15); color: #f0716d; }
+  .fb-sub { font-size: 11px; color: var(--text-faint); }
+  .fb-num { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .fin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 20px 4px; }
+  .fin-btn {
+    padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 600;
+    font-family: inherit; cursor: pointer; border: 1px solid var(--line-solid);
+    transition: .15s;
+  }
+  .fin-btn:active { transform: scale(.99); }
+  .fin-btn.expense { background: var(--surface); color: #f0716d; }
+  .fin-btn.income { background: var(--surface); color: var(--finance); }
+
+  .fin-section-label {
+    padding: 20px 20px 10px; font-size: 12px; color: var(--text-faint);
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .fin-cats { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+  .fcat {}
+  .fcat .fcat-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .fcat .fcat-emoji { font-size: 15px; }
+  .fcat .fcat-name { font-size: 13px; }
+  .fcat .fcat-sum { margin-left: auto; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fcat .fcat-pct { font-size: 11px; color: var(--text-faint); width: 34px; text-align: right; }
+  .fcat .fcat-bar { height: 7px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .fcat .fcat-bar span { display: block; height: 100%; border-radius: 4px; transition: width .5s ease; }
+
+  .fin-ops { padding: 0 20px 40px; display: flex; flex-direction: column; gap: 8px; }
+  .fop {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line-solid);
+    border-radius: 12px; padding: 11px 14px;
+  }
+  .fop .fop-emoji {
+    width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+    background: var(--surface-2); display: grid; place-items: center; font-size: 16px;
+  }
+  .fop .fop-body { flex: 1; min-width: 0; }
+  .fop .fop-cat { font-size: 14px; font-weight: 500; }
+  .fop .fop-note { font-size: 11px; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fop .fop-amount { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  .fop .fop-amount.exp { color: #f0716d; }
+  .fop .fop-amount.inc { color: var(--finance); }
+  .fop .fop-del {
+    width: 26px; height: 26px; flex-shrink: 0; border: none; background: transparent;
+    color: var(--text-faint); font-size: 17px; cursor: pointer; border-radius: 7px;
+  }
+  .fop .fop-del:active { background: var(--surface-2); color: #f0716d; }
+  .fin-empty { text-align: center; color: var(--text-faint); font-size: 13px; padding: 20px; }
+
+  /* выбор категории в модалке */
+  .cat-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .cat-opt {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 4px; border-radius: 10px; cursor: pointer;
+    background: var(--surface-2); border: 1px solid transparent; transition: .12s;
+  }
+  .cat-opt.active { border-color: var(--finance); background: rgba(94,201,176,.12); }
+  .cat-opt .co-emoji { font-size: 18px; }
+  .cat-opt .co-name { font-size: 9px; color: var(--text-dim); text-align: center; }
+
   @media (prefers-reduced-motion: reduce) {
     .brand .pulse { animation: none; }
   }
@@ -1054,6 +1137,80 @@
   </div>
 </div>
 
+<!-- ============ ЭКРАН: ФИНАНСЫ ============ -->
+<div class="screen" id="screen-finance">
+  <div class="module-head">
+    <div class="module-title">Финансы</div>
+    <div class="module-sub">Учёт доходов и расходов</div>
+  </div>
+
+  <div class="now-card">
+    <span class="nc-time" id="ncTimeFin">00:00</span>
+    <span class="nc-date" id="ncDateFin">—</span>
+    <span class="nc-label">сейчас</span>
+  </div>
+
+  <div class="month-bar">
+    <button id="finPrev">‹</button>
+    <span class="mb-label" id="finLabel">—</span>
+    <button id="finNext">›</button>
+  </div>
+
+  <!-- баланс месяца -->
+  <div class="fin-balance">
+    <div class="fb-main">
+      <div class="fb-label">Баланс за месяц</div>
+      <div class="fb-value" id="finBalance">0 ₽</div>
+    </div>
+    <div class="fb-split">
+      <div class="fb-in">
+        <span class="fb-arrow">↓</span>
+        <div><div class="fb-sub">Доходы</div><div class="fb-num" id="finIncome">0 ₽</div></div>
+      </div>
+      <div class="fb-out">
+        <span class="fb-arrow">↑</span>
+        <div><div class="fb-sub">Расходы</div><div class="fb-num" id="finExpense">0 ₽</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fin-actions">
+    <button class="fin-btn expense" id="addExpenseBtn" type="button">− Расход</button>
+    <button class="fin-btn income" id="addIncomeBtn" type="button">+ Доход</button>
+  </div>
+
+  <!-- разбивка по категориям -->
+  <div class="fin-section-label">Расходы по категориям</div>
+  <div class="fin-cats" id="finCats"></div>
+
+  <!-- список операций -->
+  <div class="fin-section-label">Операции</div>
+  <div class="fin-ops" id="finOps"></div>
+</div>
+
+<!-- Модалка: добавить операцию -->
+<div class="dtp-scrim" id="opScrim">
+  <div class="dtp">
+    <div class="dtp-title" id="opTitle">Новый расход</div>
+    <div class="dtp-col" style="margin-bottom:12px">
+      <label>Сумма, ₽</label>
+      <input type="number" id="opAmount" inputmode="numeric" placeholder="0" class="step-input">
+    </div>
+    <div class="dtp-col" style="margin-bottom:12px">
+      <label>Категория</label>
+      <div class="cat-picker" id="opCatPicker"></div>
+    </div>
+    <div class="dtp-col" style="margin-bottom:6px">
+      <label>Комментарий (необязательно)</label>
+      <input type="text" id="opNote" placeholder="напр. продукты в Пятёрочке" class="step-input" style="text-align:left;font-size:15px">
+    </div>
+    <div class="dtp-actions">
+      <button class="dtp-cancel" id="opCancel" type="button">Отмена</button>
+      <button class="dtp-ok" id="opOk" type="button" style="background:var(--finance)">Добавить</button>
+    </div>
+  </div>
+</div>
+
 <!-- Модалка выбора даты и времени -->
 <div class="dtp-scrim" id="dtpScrim">
   <div class="dtp">
@@ -1205,6 +1362,7 @@
     <div class="nav-item" data-screen="steps"><span class="ni-dot" style="background:var(--steps)"></span>Шаги</div>
     <div class="nav-item" data-screen="habit"><span class="ni-dot" style="background:var(--habit)"></span>Привычки</div>
     <div class="nav-item" data-screen="stats"><span class="ni-dot" style="background:var(--brass)"></span>Статистика</div>
+    <div class="nav-item" data-screen="finance"><span class="ni-dot" style="background:var(--finance)"></span>Финансы<span class="ni-soon">бета</span></div>
   </nav>
   <div class="drawer-foot">Ritmika · версия 0.2</div>
 </aside>
@@ -1371,6 +1529,12 @@ function tick(){
     document.getElementById('ncDateStats').textContent =
       `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
   }
+  const nfn = document.getElementById('ncTimeFin');
+  if (nfn) {
+    nfn.textContent = `${pad(h)}:${pad(m)}`;
+    document.getElementById('ncDateFin').textContent =
+      `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  }
 
   // приветствие
   const g = document.getElementById('greeting');
@@ -1398,7 +1562,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
     const target = item.dataset.screen;
     // все модули теперь готовы
-    const ready = ['home','sleep','steps','food','habit','stats'];
+    const ready = ['home','sleep','steps','food','habit','stats','finance'];
     if (!ready.includes(target)) {
       haptic(); closeDrawer(); return;
     }
@@ -1420,6 +1584,7 @@ function showScreen(name){
   if (name === 'food') renderFood();
   if (name === 'habit') renderHabits();
   if (name === 'stats') renderStats();
+  if (name === 'finance') renderFinance();
 }
 
 /* ---- настройки sheet ---- */
@@ -1466,7 +1631,8 @@ const ALL_KEYS = {
   steps:    'RITMIKA_STEPS',
   plan:     'RITMIKA_PLAN',
   food:     'RITMIKA_FOOD',
-  habits:   'RITMIKA_HABITS'
+  habits:   'RITMIKA_HABITS',
+  finance:  'RITMIKA_FIN'
 };
 
 // универсальное чтение одного ключа (cloud или localStorage)
@@ -1491,15 +1657,31 @@ document.getElementById('exportBtn').addEventListener('click', async ()=>{
     const raw = await readKey(key);
     dump.data[name] = raw ? JSON.parse(raw) : null;
   }
-  const blob = new Blob([JSON.stringify(dump,null,2)], {type:'application/json'});
+  const json = JSON.stringify(dump,null,2);
+  const d = new Date();
+  const filename = `ritmika-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+  const blob = new Blob([json], {type:'application/json'});
+  const file = new File([blob], filename, {type:'application/json'});
+
+  // 1) на телефоне (iOS/Android) — нативное «Поделиться» с файлом: сохранить в Файлы, отправить в Telegram и т.д.
+  if (navigator.canShare && navigator.canShare({ files:[file] })) {
+    try {
+      await navigator.share({ files:[file], title:'Бэкап Ritmika' });
+      flash('Готово');
+      return;
+    } catch(e){
+      if (e && e.name === 'AbortError') return; // пользователь закрыл шторку
+      // иначе падаем на запасные варианты ниже
+    }
+  }
+
+  // 2) десктоп — обычное скачивание файла
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const d = new Date();
-  a.href = url;
-  a.download = `ritmika-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+  a.href = url; a.download = filename;
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-  flash('Данные сохранены в файл');
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  flash('Файл сохранён');
 });
 
 document.getElementById('importBtn').addEventListener('click', ()=>{
@@ -1722,22 +1904,35 @@ function renderDiary(){
   const today = new Date();
   const isThis = today.getFullYear()===sYear && today.getMonth()===sMonth;
 
+  // группируем ВСЕ записи по дате пробуждения (может быть несколько за день)
   const byWake={};
-  SLEEP.forEach(r => { byWake[dKey(new Date(r.wake))] = r; });
+  SLEEP.forEach(r => {
+    const k = dKey(new Date(r.wake));
+    (byWake[k] = byWake[k] || []).push(r);
+  });
 
   for (let day=1; day<=days; day++){
     const ds=`${sYear}-${pad(sMonth+1)}-${pad(day)}`;
-    const rec=byWake[ds];
+    const recs=byWake[ds] || [];
     const row=document.createElement('div');
     row.className='drow'+(isThis && day===today.getDate()?' today':'');
     const num=document.createElement('div'); num.className='dnum'; num.textContent=day;
     row.appendChild(num);
     const track=document.createElement('div'); track.className='dtrack';
-    if (rec){
-      const bed=new Date(rec.bed), wake=new Date(rec.wake);
-      const dm=(wake-bed)/60000;
-      drawDiaryBar(track, bed, wake, dm);
-      track.addEventListener('click', ()=>editRec(rec));
+    if (recs.length){
+      // суммарная длительность за день (для подписи справа)
+      let totalMin=0;
+      recs.forEach(rec=>{
+        const bed=new Date(rec.bed), wake=new Date(rec.wake);
+        const dm=(wake-bed)/60000; totalMin+=dm;
+        drawDiaryBar(track, bed, wake, dm, rec);
+      });
+      // одна подпись суммы справа
+      const dur=document.createElement('div'); dur.className='ddur';
+      dur.textContent=(totalMin/60).toFixed(1).replace('.0','')+'ч';
+      track.appendChild(dur);
+      // клик по пустому месту строки — добавить ещё один сон на этот день
+      track.addEventListener('click', (e)=>{ if(e.target===track) quickPick(sYear,sMonth,day); });
     } else {
       track.addEventListener('click', ()=>quickPick(sYear,sMonth,day));
     }
@@ -1746,7 +1941,7 @@ function renderDiary(){
   }
 }
 
-function drawDiaryBar(track, bed, wake, dm){
+function drawDiaryBar(track, bed, wake, dm, rec){
   const wd=new Date(wake.getFullYear(),wake.getMonth(),wake.getDate());
   const start=new Date(wd); start.setDate(start.getDate()-1); start.setHours(TL_START,0,0,0);
   const end=new Date(start); end.setHours(start.getHours()+TL_HOURS);
@@ -1764,9 +1959,9 @@ function drawDiaryBar(track, bed, wake, dm){
   if (s<0) bar.classList.add('wl');
   if (e>1) bar.classList.add('wr');
   bar.style.left=(cs*100)+'%'; bar.style.width=((ce-cs)*100)+'%';
-  const dur=document.createElement('div'); dur.className='ddur';
-  dur.textContent=(dm/60).toFixed(1).replace('.0','')+'ч';
-  track.appendChild(bar); track.appendChild(dur);
+  // клик по самой полосе — редактировать/удалить именно её
+  if (rec){ bar.style.cursor='pointer'; bar.addEventListener('click', (ev)=>{ ev.stopPropagation(); editRec(rec); }); }
+  track.appendChild(bar);
 }
 
 /* быстрый ввод по клику на пустой день */
@@ -2331,18 +2526,18 @@ function renderStats(){
 
 /* --- СОН: линейный график длительности --- */
 function renderSleepStat(days){
-  // сон привязан к дате пробуждения
-  const byWake={}; SLEEP.forEach(r=>{ byWake[dKey(new Date(r.wake))] = r; });
-  const vals = days.map(d=>{
-    const r=byWake[d.key];
-    if(!r) return null;
-    return (new Date(r.wake)-new Date(r.bed))/3600000; // часы
+  // сон привязан к дате пробуждения; суммируем все сны за день
+  const byWake={};
+  SLEEP.forEach(r=>{
+    const k=dKey(new Date(r.wake));
+    byWake[k]=(byWake[k]||0)+(new Date(r.wake)-new Date(r.bed))/3600000;
   });
+  const vals = days.map(d=> byWake[d.key] != null ? byWake[d.key] : null);
   const present = vals.filter(v=>v!=null);
   const avg = present.length ? present.reduce((a,b)=>a+b,0)/present.length : 0;
   document.getElementById('statSleepAvg').textContent = present.length ? fmtDur(avg*60) : '—';
   document.getElementById('statSleepSub').textContent = present.length
-    ? `среднее за ${present.length} ${plur(present.length,'ночь','ночи','ночей')} · цель 8 ч`
+    ? `среднее за ${present.length} ${plur(present.length,'день','дня','дней')} · цель 8 ч`
     : 'нет записей за период';
   document.getElementById('chartSleep').innerHTML =
     present.length ? lineChart(vals, days, {goal:8, unit:'ч', color:'var(--sleep)', max:12}) : emptyChart();
@@ -2517,6 +2712,173 @@ function plur(n, one, few, many){
   if(m10>=2 && m10<=4 && (m100<10||m100>=20)) return few;
   return many;
 }
+
+/* ============================================================
+   МОДУЛЬ: ФИНАНСЫ (бета)
+   FIN: [ {id, type:'exp'|'inc', amount, cat, note, date:'YYYY-MM-DD'} ]
+   ============================================================ */
+const FIN_KEY='RITMIKA_FIN';
+let FIN=[];
+let finYear, finMonth;
+let opType='exp';       // тип текущей вводимой операции
+let opCat=null;         // выбранная категория
+
+// категории расходов и доходов с эмодзи и цветом
+const EXP_CATS=[
+  {id:'food',  name:'Еда',        emoji:'🍎', color:'#7fc98a'},
+  {id:'cafe',  name:'Кафе',       emoji:'☕', color:'#e0a45e'},
+  {id:'transp',name:'Транспорт',  emoji:'🚗', color:'#7b9df0'},
+  {id:'shop',  name:'Покупки',    emoji:'🛍️', color:'#d98fd0'},
+  {id:'health',name:'Здоровье',   emoji:'💊', color:'#f0716d'},
+  {id:'fun',   name:'Досуг',      emoji:'🎮', color:'#c9a25e'},
+  {id:'home',  name:'Дом',        emoji:'🏠', color:'#5ec9b0'},
+  {id:'other', name:'Прочее',     emoji:'📦', color:'#a49d8b'}
+];
+const INC_CATS=[
+  {id:'salary',name:'Зарплата',   emoji:'💼', color:'#5ec9b0'},
+  {id:'extra', name:'Подработка', emoji:'🔧', color:'#7fc98a'},
+  {id:'gift',  name:'Подарок',    emoji:'🎁', color:'#d98fd0'},
+  {id:'other_i',name:'Прочее',    emoji:'💰', color:'#c9a25e'}
+];
+function catById(id){ return [...EXP_CATS,...INC_CATS].find(c=>c.id===id) || {name:'Прочее',emoji:'📦',color:'#a49d8b'}; }
+
+function finLoad(){
+  return new Promise(res=>{
+    if (hasCloud) cloud.getItem(FIN_KEY,(e,v)=>{ if(e||!v)return res([]); try{res(JSON.parse(v))}catch{res([])} });
+    else { try{res(JSON.parse(localStorage.getItem(FIN_KEY)||'[]'))}catch{res([])} }
+  });
+}
+function finSave(){ const s=JSON.stringify(FIN); if(hasCloud)cloud.setItem(FIN_KEY,s,()=>{}); else localStorage.setItem(FIN_KEY,s); }
+function fmtMoney(n){ return n.toLocaleString('ru-RU')+' ₽'; }
+
+/* --- переключение месяца --- */
+document.getElementById('finPrev').addEventListener('click', ()=>{
+  finMonth--; if(finMonth<0){finMonth=11;finYear--;} renderFinance(); haptic();
+});
+document.getElementById('finNext').addEventListener('click', ()=>{
+  finMonth++; if(finMonth>11){finMonth=0;finYear++;} renderFinance(); haptic();
+});
+
+/* --- модалка операции --- */
+const opScrim=document.getElementById('opScrim');
+function openOpModal(type){
+  opType=type; opCat=null;
+  document.getElementById('opTitle').textContent = type==='exp'?'Новый расход':'Новый доход';
+  document.getElementById('opAmount').value='';
+  document.getElementById('opNote').value='';
+  // рисуем категории
+  const cats = type==='exp'?EXP_CATS:INC_CATS;
+  document.getElementById('opCatPicker').innerHTML = cats.map(c=>
+    `<div class="cat-opt" data-cat="${c.id}"><span class="co-emoji">${c.emoji}</span><span class="co-name">${c.name}</span></div>`
+  ).join('');
+  document.querySelectorAll('#opCatPicker .cat-opt').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('#opCatPicker .cat-opt').forEach(x=>x.classList.remove('active'));
+      el.classList.add('active'); opCat=el.dataset.cat; haptic();
+    });
+  });
+  opScrim.classList.add('open');
+  setTimeout(()=>document.getElementById('opAmount').focus(),100);
+  haptic();
+}
+document.getElementById('addExpenseBtn').addEventListener('click', ()=>openOpModal('exp'));
+document.getElementById('addIncomeBtn').addEventListener('click', ()=>openOpModal('inc'));
+document.getElementById('opCancel').addEventListener('click', ()=>opScrim.classList.remove('open'));
+opScrim.addEventListener('click', e=>{ if(e.target===opScrim) opScrim.classList.remove('open'); });
+document.getElementById('opOk').addEventListener('click', ()=>{
+  const amount=parseInt(document.getElementById('opAmount').value,10);
+  if(isNaN(amount)||amount<=0){ flash('Введи сумму'); return; }
+  if(!opCat){ flash('Выбери категорию'); return; }
+  const now=new Date();
+  FIN.push({
+    id:Date.now().toString(36), type:opType, amount, cat:opCat,
+    note:document.getElementById('opNote').value.trim(),
+    date:`${finYear}-${pad(finMonth+1)}-${pad(now.getDate())}`
+  });
+  finSave(); haptic('medium');
+  opScrim.classList.remove('open');
+  renderFinance();
+});
+
+/* --- отрисовка --- */
+function renderFinance(){
+  if(finYear==null){ const n=new Date(); finYear=n.getFullYear(); finMonth=n.getMonth(); }
+  document.getElementById('finLabel').textContent=`${MONTHS_NOM[finMonth]} ${finYear}`;
+
+  const monthKey=`${finYear}-${pad(finMonth+1)}`;
+  const ops=FIN.filter(o=>o.date.startsWith(monthKey))
+    .sort((a,b)=>b.id.localeCompare(a.id)); // новые сверху
+
+  let income=0, expense=0;
+  const byCat={};
+  ops.forEach(o=>{
+    if(o.type==='inc') income+=o.amount;
+    else { expense+=o.amount; byCat[o.cat]=(byCat[o.cat]||0)+o.amount; }
+  });
+  const balance=income-expense;
+
+  // баланс
+  const bEl=document.getElementById('finBalance');
+  bEl.textContent=(balance>=0?'+':'−')+fmtMoney(Math.abs(balance));
+  bEl.className='fb-value '+(balance>=0?'pos':'neg');
+  document.getElementById('finIncome').textContent=fmtMoney(income);
+  document.getElementById('finExpense').textContent=fmtMoney(expense);
+
+  // категории расходов (сортируем по убыванию суммы)
+  const catsEl=document.getElementById('finCats');
+  const catEntries=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  if(!catEntries.length){
+    catsEl.innerHTML='<div class="fin-empty">Расходов пока нет</div>';
+  } else {
+    catsEl.innerHTML=catEntries.map(([cid,sum])=>{
+      const c=catById(cid);
+      const pct=expense?Math.round(sum/expense*100):0;
+      return `<div class="fcat">
+        <div class="fcat-top">
+          <span class="fcat-emoji">${c.emoji}</span>
+          <span class="fcat-name">${c.name}</span>
+          <span class="fcat-sum">${fmtMoney(sum)}</span>
+          <span class="fcat-pct">${pct}%</span>
+        </div>
+        <div class="fcat-bar"><span style="width:${pct}%;background:${c.color}"></span></div>
+      </div>`;
+    }).join('');
+  }
+
+  // список операций
+  const opsEl=document.getElementById('finOps');
+  if(!ops.length){
+    opsEl.innerHTML='<div class="fin-empty">Операций пока нет.<br>Добавь расход или доход выше.</div>';
+  } else {
+    opsEl.innerHTML=ops.map(o=>{
+      const c=catById(o.cat);
+      const day=o.date.split('-')[2];
+      const sign=o.type==='exp'?'−':'+';
+      return `<div class="fop">
+        <div class="fop-emoji">${c.emoji}</div>
+        <div class="fop-body">
+          <div class="fop-cat">${c.name}</div>
+          <div class="fop-note">${o.note?escapeHtml(o.note)+' · ':''}${day} ${MONTHS[finMonth].slice(0,3)}</div>
+        </div>
+        <div class="fop-amount ${o.type==='exp'?'exp':'inc'}">${sign}${fmtMoney(o.amount)}</div>
+        <button class="fop-del" data-id="${o.id}">×</button>
+      </div>`;
+    }).join('');
+    opsEl.querySelectorAll('.fop-del').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        FIN=FIN.filter(x=>x.id!==btn.dataset.id);
+        finSave(); haptic('heavy'); renderFinance();
+      });
+    });
+  }
+}
+
+/* инициализация */
+(async function initFinance(){
+  const n=new Date(); finYear=n.getFullYear(); finMonth=n.getMonth();
+  FIN=await finLoad();
+  if(document.body.getAttribute('data-screen')==='finance') renderFinance();
+})();
 </script>
 </body>
 </html>
